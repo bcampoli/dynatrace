@@ -1,0 +1,51 @@
+package problems
+
+// Event TODO: documentation
+type Event struct {
+	EntityID                                  string            `json:"entityID,omitempty" xml:"entityID,omitempty,attr"`
+	EntityName                                string            `json:"entityName,omitempty" xml:"entityName,omitempty,attr"`
+	StartTime                                 int64             `json:"startTime,omitempty" xml:"startTime,omitempty,attr"`
+	EndTime                                   int64             `json:"endTime,omitempty" xml:"endTime,omitempty,attr"`
+	SeverityLevel                             severityLevel     `json:"severityLevel,omitempty" xml:"severityLevel,attr,omitempty"`
+	ImpactLevel                               impactLevel       `json:"impactLevel,omitempty" xml:"impactLevel,attr,omitempty"`
+	EventType                                 eventType         `json:"eventType,omitempty" xml:"eventType,attr,omitempty"`
+	Status                                    eventStatus       `json:"status,omitempty" xml:"status,attr,omitempty"`
+	Severities                                []EventSeverity   `json:"severities,omitempty" xml:"severities>eventSeverity"`
+	IsRootCause                               bool              `json:"isRootCause" xml:"isRootCause,attr"`
+	DeploymentProject                         string            `json:"deploymentProject,omitempty" xml:"deploymentProject,attr,omitempty"`
+	CPULimitInMHz                             int32             `json:"cpuLimitInMHz,omitempty" xml:"cpuLimitInMHz,attr,omitempty"`
+	DeploymentParamAdded                      bool              `json:"deploymentParamAdded,omitempty" xml:"deploymentParamAdded,attr,omitempty"`
+	IsClusterWide                             bool              `json:"isClusterWide" xml:"isClusterWide,attr"`
+	Source                                    string            `json:"source,omitempty" xml:"source,attr,omitempty"`
+	EffectiveEntity                           string            `json:"effectiveEntity,omitempty" xml:"effectiveEntity,attr,omitempty"`
+	OperatingSystem                           string            `json:"operatingSystem,omitempty" xml:"operatingSystem,attr,omitempty"`
+	Artifact                                  string            `json:"artifact,omitempty" xml:"artifact,attr,omitempty"`
+	CPULoad                                   float64           `json:"cpuLoad,omitempty" xml:"cpuLoad,attr,omitempty"`
+	AffectedRequestsPerMinute                 float64           `json:"affectedRequestsPerMinute,omitempty" xml:"affectedRequestsPerMinute,attr,omitempty"`
+	AnnotationDescription                     string            `json:"annotationDescription,omitempty" xml:"annotationDescription,attr,omitempty"`
+	Browser                                   *browser          `json:"browser,omitempty" xml:"browser,attr,omitempty"`
+	AffectedSyntheticLocations                []string          `json:"affectedSyntheticLocations,omitempty" xml:"affectedSyntheticLocations>location,omitempty"`
+	DeploymentName                            string            `json:"deploymentName,omitempty" xml:"deploymentName,attr,omitempty"`
+	DeploymentParamRemoved                    string            `json:"deploymentParamRemoved,omitempty" xml:"deploymentParamRemoved,attr,omitempty"`
+	UserDefined50thPercentileThreshold        float64           `json:"userDefined50thPercentileThreshold,omitempty" xml:"userDefined50thPercentileThreshold,attr,omitempty"`
+	ServiceMethodGroup                        string            `json:"serviceMethodGroup,omitempty" xml:"serviceMethodGroup,attr,omitempty"`
+	ReferenceResponseTime90thPercentile       float64           `json:"referenceResponseTime90thPercentile,omitempty" xml:"referenceResponseTime90thPercentile,attr,omitempty"`
+	UserAction                                string            `json:"userAction,omitempty" xml:"userAction,attr,omitempty"`
+	MinimumProcessGroupInstanceCountThreshold int32             `json:"minimumProcessGroupInstanceCountThreshold,omitempty" xml:"minimumProcessGroupInstanceCountThreshold,attr,omitempty"`
+	ReferenceResponseTime50thPercentile       float64           `json:"referenceResponseTime50thPercentile,omitempty" xml:"referenceResponseTime50thPercentile,attr,omitempty"`
+	UserDefined90thPercentileThreshold        float64           `json:"userDefined90thPercentileThreshold,omitempty" xml:"userDefined90thPercentileThreshold,attr,omitempty"`
+	DeploymentVersion                         string            `json:"deploymentVersion,omitempty" xml:"deploymentVersion,attr,omitempty"`
+	AnnotationType                            string            `json:"annotationType,omitempty" xml:"annotationType,attr,omitempty"`
+	AffectedSyntheticActions                  []string          `json:"affectedSyntheticActions,omitempty" xml:"affectedSyntheticActions>action,omitempty"`
+	AffectedUserActionsPerMinute              float64           `json:"affectedUserActionsPerMinute,omitempty" xml:"affectedUserActionsPerMinute,attr,omitempty"`
+	ActiveMaintenanceWindows                  []string          `json:"activeMaintenanceWindows,omitempty" xml:"activeMaintenanceWindows>maintenanceWindow,omitempty"`
+	MobileAppVersion                          string            `json:"mobileAppVersion,omitempty" xml:"mobileAppVersion,attr,omitempty"`
+	UserDefinedFailureRateThreshold           float64           `json:"userDefinedFailureRateThreshold,omitempty" xml:"userDefinedFailureRateThreshold,attr,omitempty"`
+	Percentile                                *percentile       `json:"percentile,omitempty" xml:"percentile,attr,omitempty"`
+	CustomProperties                          *CustomProperties `json:"customProperties,omitempty"`
+	RemediationAction                         string            `json:"remediationAction,omitempty" xml:"remediationAction,attr,omitempty"`
+	Service                                   string            `json:"service,omitempty" xml:"service,attr,omitempty"`
+	CIBackLink                                string            `json:"ciBackLink,omitempty" xml:"ciBackLink,attr,omitempty"`
+	Geolocation                               string            `json:"geolocation,omitempty" xml:"geolocation,attr,omitempty"`
+	ServiceMethod                             string            `json:"serviceMethod,omitempty" xml:"serviceMethod,attr,omitempty"`
+}
