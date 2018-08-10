@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"github.com/dtcookie/dynatrace/rest"
 	"github.com/dtcookie/dynatrace/apis/problems"
 )
 
@@ -85,8 +84,7 @@ func httpHandler(w http.ResponseWriter, request *http.Request) {
 		return
 	}
 	fmt.Println("  ... querying for problem details")
-	credentials := rest.NewSaasCredentials("siz65484", "KN7jh2l6ROOxdtYJk3KX_")
-	problemAPI := problems.NewAPI(credentials)
+	problemAPI := problems.NewAPI(notificationHandler.Credentials())
 	var problem *problems.Problem
 	if problem, err = problemAPI.Get(defNotification.PID); err != nil {
 		fmt.Println(err.Error())
