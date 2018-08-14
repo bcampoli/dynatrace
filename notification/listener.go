@@ -74,6 +74,11 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		log.Error(err)
 		return
 	}
+	if (defNotification.Title == "Dynatrace problem notification test run") || (defNotification.PID == "999999") {
+		log.Info("Dynatrace problem notification test run successful")
+		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
+		return
+	}
 
 	if listener.config.verbose {
 		log.Info("received problem notification " + toJSON(defNotification))
@@ -81,10 +86,6 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		if defNotification.PID != "" {
 			log.Info("received problem notification for PID " + defNotification.PID)
 		}
-	}
-	if (defNotification.Title == "Dynatrace problem notification test run") || (defNotification.PID == "999999") {
-		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
-		return
 	}
 
 	if defNotification.PID == "" {
