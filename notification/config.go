@@ -60,6 +60,8 @@ func readConfigFromEnv(target *Config) {
 	var cluster string
 	var err error
 
+	config = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
+
 	environmentID = os.Getenv("DT_NOTIFICATION_ENVIRONMENT")
 	if environmentID != "" {
 		config.Credentials.EnvironmentID = environmentID
@@ -81,50 +83,60 @@ func readConfigFromEnv(target *Config) {
 		}
 	}
 
-	adoptConfig(target, &config)
+	adoptConfig(target, &config, "ENV")
 }
 
 func readConfigFromFlags(target *Config, args []string) error {
-	var config Config
 	var configFromFile Config
 	var configFromFlags Config
 	var configFileName string
 	var err error
 
+	// fmt.Println("-------")
+	// for _, arg := range args {
+	// 	fmt.Println(arg)
+	// }
+	// fmt.Println("-------")
+
 	configFromFile = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 	configFromFlags = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 
-	flagSet := flag.NewFlagSet("dynatrace", flag.ContinueOnError)
+	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 	flagSet.StringVar(&configFileName, "config", "", "")
 	flagSet.IntVar(&configFromFlags.ListenPort, "listen", 0, "")
 	flagSet.StringVar(&configFromFlags.Credentials.EnvironmentID, "environment", "", "")
 	flagSet.StringVar(&configFromFlags.Credentials.Cluster, "cluster", "", "")
-	flagSet.StringVar(&configFromFlags.Credentials.APIToken, "apiToken", "", "")
-	if err = flagSet.Parse(args); err != nil {
+	flagSet.StringVar(&configFromFlags.Credentials.APIToken, "api-token", "", "")
+	flagSet.Usage = func() {}
+	if err = flagSet.Parse(args[1:]); err != nil {
 		return err
 	}
 
 	if configFileName != "" {
 		readConfigFromFile(&configFromFile, configFileName)
-		adoptConfig(&configFromFile, &configFromFlags)
+		adoptConfig(target, &configFromFile, "FILE")
 	}
 
-	adoptConfig(&config, &configFromFlags)
+	adoptConfig(target, &configFromFlags, "FLAGS")
 
 	return nil
 }
 
-func adoptConfig(target *Config, source *Config) {
+func adoptConfig(target *Config, source *Config, sourceName string) {
 	if source.ListenPort != 0 {
+		// fmt.Println(".. adopting " + "ListenPort" + " from config " + sourceName)
 		target.ListenPort = source.ListenPort
 	}
 	if source.Credentials.EnvironmentID != "" {
+		// fmt.Println(".. adopting " + "EnvironmentID" + " from config " + sourceName)
 		target.Credentials.EnvironmentID = source.Credentials.EnvironmentID
 	}
 	if source.Credentials.APIToken != "" {
+		// fmt.Println(".. adopting " + "APIToken" + " from config " + sourceName)
 		target.Credentials.APIToken = source.Credentials.APIToken
 	}
 	if source.Credentials.Cluster != "" {
+		// fmt.Println(".. adopting " + "Cluster" + " from config " + sourceName)
 		target.Credentials.Cluster = source.Credentials.Cluster
 	}
 }
