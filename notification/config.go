@@ -24,7 +24,7 @@ func NewConfig(listenPort int, credentials *rest.Credentials) *Config {
 }
 
 // ParseConfig TODO: documentation
-func ParseConfig() (*Config, error) {
+func ParseConfig(flagset *flag.FlagSet) (*Config, error) {
 	args := os.Args
 	var config Config
 	var err error
@@ -32,7 +32,7 @@ func ParseConfig() (*Config, error) {
 	config = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 
 	readConfigFromEnv(&config)
-	if err = readConfigFromFlags(&config, args); err != nil {
+	if err = readConfigFromFlags(&config, flagset, args); err != nil {
 		return nil, err
 	}
 
@@ -86,7 +86,7 @@ func readConfigFromEnv(target *Config) {
 	adoptConfig(target, &config, "ENV")
 }
 
-func readConfigFromFlags(target *Config, args []string) error {
+func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []string) error {
 	var configFromFile Config
 	var configFromFlags Config
 	var configFileName string
@@ -102,11 +102,19 @@ func readConfigFromFlags(target *Config, args []string) error {
 	configFromFlags = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
+
+	if parentFlags != nil {
+		parentFlags.VisitAll(func(flag *flag.Flag) {
+			flagSet.Var(flag.Value, flag.Name, flag.Usage)
+		})
+	}
+
 	flagSet.StringVar(&configFileName, "config", "", "")
 	flagSet.IntVar(&configFromFlags.ListenPort, "listen", 0, "")
 	flagSet.StringVar(&configFromFlags.Credentials.EnvironmentID, "environment", "", "")
 	flagSet.StringVar(&configFromFlags.Credentials.Cluster, "cluster", "", "")
 	flagSet.StringVar(&configFromFlags.Credentials.APIToken, "api-token", "", "")
+
 	flagSet.Usage = func() {}
 	if err = flagSet.Parse(args[1:]); err != nil {
 		return err

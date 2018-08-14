@@ -1,6 +1,8 @@
 package notification
 
-import "github.com/dtcookie/dynatrace/apis/problems"
+import (
+	"github.com/dtcookie/dynatrace/apis/problems"
+)
 
 // Handler TODO: documentation
 type Handler interface {
