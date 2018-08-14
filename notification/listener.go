@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 
+	"github.com/dtcookie/dynatrace/apis/cluster"
 	"github.com/dtcookie/dynatrace/apis/problems"
 	"github.com/dtcookie/dynatrace/log"
 )
@@ -21,6 +22,15 @@ type listener struct {
 }
 
 func (listener *listener) listen() {
+	var clusterVersion string
+	var err error
+
+	clusterAPI := cluster.NewAPI(&listener.config.Credentials)
+	if clusterVersion, err = clusterAPI.Get(); err != nil {
+		log.Error(err)
+		return
+	}
+	log.Info("Dynatrace Cluster Version: " + clusterVersion)
 	http.HandleFunc("/", listener.handleHTTP)
 	log.Info(fmt.Sprintf("Listening on port %d for incoming problem notifications.", listener.config.ListenPort))
 	http.ListenAndServe(fmt.Sprintf(":%d", listener.config.ListenPort), nil)
