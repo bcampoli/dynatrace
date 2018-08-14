@@ -1,7 +1,9 @@
 package main
 
 import (
+	"bytes"
 	"fmt"
+	"net/http"
 	"strings"
 
 	"github.com/dtcookie/dynatrace/apis/problems"
@@ -13,10 +15,27 @@ type PrintHandler struct {
 	notification.Handler
 }
 
+// Post TODO: documentation
+func (handler *PrintHandler) Post(URL string, problem *problems.Problem) error {
+	var err error
+	var response *http.Response
+	var request *http.Request
+	if request, err = http.NewRequest(http.MethodPost, URL, bytes.NewBuffer([]byte(toXML(problem)))); err != nil {
+		return err
+	}
+	request.Header.Set("Content-Type", "application/xml")
+
+	httpClient := &http.Client{}
+	if response, err = httpClient.Do(request); err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	return nil
+}
+
 // Handle TODO: documentation
 func (handler *PrintHandler) Handle(problem *problems.Problem) error {
-	fmt.Println(toXML(problem))
-	return nil
+	return handler.Post("http://postb.in/R06fBRsq", problem)
 }
 
 func main() {
@@ -33,5 +52,5 @@ func main() {
 		fmt.Println("  Hint: you can also specify the -config flag referring to a JSON file containing the parameters")
 		return
 	}
-	notification.Listen(config, &PrintHandler{})
+	notification.Listen(config, new(PrintHandler))
 }
