@@ -42,7 +42,7 @@ func (client *Client) Get(path string) ([]byte, error) {
 		return make([]byte, 0), err
 	}
 	if httpResponse.StatusCode != http.StatusOK {
-		return nil, errors.New(http.StatusText(httpResponse.StatusCode))
+		return nil, errors.New(http.StatusText(httpResponse.StatusCode) + " (GET " + apiBaseURL + path + ")")
 	}
 	return ioutil.ReadAll(httpResponse.Body)
 }
