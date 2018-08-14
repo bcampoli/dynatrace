@@ -12,8 +12,8 @@ type Credentials struct {
 }
 
 // NewSaasCredentials TODO: documentation
-func NewSaasCredentials(environmentID string, apiToken string) Credentials {
-	return Credentials{
+func NewSaasCredentials(environmentID string, apiToken string) *Credentials {
+	return &Credentials{
 		Cluster:       "",
 		EnvironmentID: environmentID,
 		APIToken:      apiToken,
@@ -21,8 +21,8 @@ func NewSaasCredentials(environmentID string, apiToken string) Credentials {
 }
 
 // NewManagedCredentials TODO: documentation
-func NewManagedCredentials(cluster string, environmentID string, apiToken string) Credentials {
-	return Credentials{
+func NewManagedCredentials(cluster string, environmentID string, apiToken string) *Credentials {
+	return &Credentials{
 		Cluster:       cluster,
 		EnvironmentID: environmentID,
 		APIToken:      apiToken,

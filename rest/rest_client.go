@@ -7,11 +7,11 @@ import (
 
 // Client TODO: documentation
 type Client struct {
-	credentials Credentials
+	credentials *Credentials
 }
 
 // NewClient TODO: documentation
-func NewClient(credentials Credentials) *Client {
+func NewClient(credentials *Credentials) *Client {
 	client := Client{}
 	client.credentials = credentials
 	return &client

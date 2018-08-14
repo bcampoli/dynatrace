@@ -12,7 +12,7 @@ type API struct {
 }
 
 // NewAPI TODO: documentation
-func NewAPI(credentials rest.Credentials) *API {
+func NewAPI(credentials *rest.Credentials) *API {
 	return &API{
 		client: rest.NewClient(credentials),
 	}
@@ -32,4 +32,3 @@ func (api *API) Get(ID string) (*Problem, error) {
 	}
 	return &problemResult.Result, nil
 }
-

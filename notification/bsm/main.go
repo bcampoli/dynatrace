@@ -5,22 +5,11 @@ import (
 
 	"github.com/dtcookie/dynatrace/apis/problems"
 	"github.com/dtcookie/dynatrace/notification"
-	"github.com/dtcookie/dynatrace/rest"
 )
 
 // PrintHandler TODO: documentation
 type PrintHandler struct {
 	notification.Handler
-}
-
-// ListenPort TODO: documentation
-func (handler *PrintHandler) ListenPort() int {
-	return 80
-}
-
-// Credentials TODO: documentation
-func (handler *PrintHandler) Credentials() rest.Credentials {
-	return rest.NewSaasCredentials("siz65484", "KN7jh2l6ROOxdtYJk3KX_")
 }
 
 // Handle TODO: documentation
@@ -30,5 +19,13 @@ func (handler *PrintHandler) Handle(problem *problems.Problem) error {
 }
 
 func main() {
-	notification.Launch(&PrintHandler{})
+	var err error
+	var config *notification.Config
+
+	if config, err = notification.ParseConfig(); err != nil {
+		fmt.Println(err.Error())
+		fmt.Println("USAGE: bsm [-environment <environment-id>] [-api-token <api-token>] [-cluster <cluster-url>] [-listen <listen-port>]")
+		return
+	}
+	notification.Listen(config, &PrintHandler{})
 }
