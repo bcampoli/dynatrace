@@ -3,6 +3,7 @@ package main
 import (
 	"bytes"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 	"strings"
 
@@ -30,6 +31,7 @@ func (handler *PrintHandler) Post(URL string, problem *problems.Problem) error {
 		return err
 	}
 	defer response.Body.Close()
+	ioutil.ReadAll(response.Body)
 	return nil
 }
 
