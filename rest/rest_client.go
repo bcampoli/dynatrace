@@ -3,6 +3,7 @@ package rest
 import (
 	"io/ioutil"
 	"net/http"
+	"strings"
 )
 
 // Client TODO: documentation
@@ -22,7 +23,11 @@ func (client *Client) Get(path string) ([]byte, error) {
 	var err error
 	var httpResponse *http.Response
 	var request *http.Request
-	if request, err = http.NewRequest(http.MethodGet, client.credentials.BaseURL()+path, nil); err != nil {
+	apiBaseURL := client.credentials.APIBaseURL
+	if !strings.HasSuffix(apiBaseURL, "/") {
+		apiBaseURL = apiBaseURL + "/"
+	}
+	if request, err = http.NewRequest(http.MethodGet, apiBaseURL+path, nil); err != nil {
 		return make([]byte, 0), err
 	}
 	if err = client.credentials.Authenticate(request); err != nil {

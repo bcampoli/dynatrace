@@ -34,7 +34,7 @@ func parseConfig(handler *BSMhandler) *notification.Config {
 
 func usage() {
 	fmt.Println()
-	fmt.Println("USAGE: bsm [-environment <environment-id>] [-api-token <api-token>] [-cluster <cluster-url>] [-listen <listen-port>] [-config <config-json-file>")
-	fmt.Println("  Hint: you can also define the environment variables DT_NOTIFICATION_ENVIRONMENT, DT_NOTIFICATION_API_TOKEN, DT_NOTIFICATION_CLUSTER and DT_NOTIFICATION_LISTEN_PORT")
+	fmt.Println("USAGE: bsm [-api-base-url <api-base-url>] [-api-token <api-token>] [-listen <listen-port>] [-config <config-json-file>")
+	fmt.Println("  Hint: you can also define the environment variables DT_API_BASE_URL, DT_API_TOKEN and DT_LISTEN_PORT")
 	fmt.Println("  Hint: you can also specify the -config flag referring to a JSON file containing the parameters")
 }

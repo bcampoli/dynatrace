@@ -45,8 +45,8 @@ func ParseConfig(flagset *flag.FlagSet) (*Config, error) {
 		return nil, errors.New("no api token specified")
 	}
 
-	if config.Credentials.EnvironmentID == "" {
-		return nil, errors.New("no environment id specified")
+	if config.Credentials.APIBaseURL == "" {
+		return nil, errors.New("no api base url specified")
 	}
 
 	return &config, nil
@@ -56,33 +56,28 @@ func readConfigFromEnv(target *Config) {
 	var config Config
 	var sListenPort string
 	var listenPort int
-	var environmentID string
+	var apiBaseURL string
 	var apiToken string
-	var cluster string
 	var err error
 
-	environmentID = os.Getenv("DT_NOTIFICATION_ENVIRONMENT")
-	if environmentID != "" {
-		config.Credentials.EnvironmentID = environmentID
+	apiBaseURL = os.Getenv("DT_API_BASE_URL")
+	if apiBaseURL != "" {
+		config.Credentials.APIBaseURL = apiBaseURL
 	}
-	apiToken = os.Getenv("DT_NOTIFICATION_API_TOKEN")
+	apiToken = os.Getenv("DT_API_TOKEN")
 	if apiToken != "" {
 		config.Credentials.APIToken = apiToken
 	}
-	cluster = os.Getenv("DT_NOTIFICATION_CLUSTER")
-	if cluster != "" {
-		config.Credentials.Cluster = cluster
-	}
-	sListenPort = os.Getenv("DT_NOTIFICATION_LISTEN_PORT")
+	sListenPort = os.Getenv("DT_LISTEN_PORT")
 	if sListenPort != "" {
 		if listenPort, err = strconv.Atoi(sListenPort); err != nil {
-			fmt.Println("the value environment variable '" + "DT_NOTIFICATION_LISTEN_PORT" + "' is not a valid listen port")
+			fmt.Println("the value environment variable '" + "DT_LISTEN_PORT" + "' is not a valid listen port")
 		} else {
 			config.ListenPort = listenPort
 		}
 	}
 
-	adoptConfig(target, &config, "ENV")
+	adoptConfig(target, &config)
 }
 
 func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []string) error {
@@ -102,8 +97,7 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 	flagSet.BoolVar(&configFromFlags.verbose, "v", false, "")
 	flagSet.StringVar(&configFileName, "config", "", "")
 	flagSet.IntVar(&configFromFlags.ListenPort, "listen", 0, "")
-	flagSet.StringVar(&configFromFlags.Credentials.EnvironmentID, "environment", "", "")
-	flagSet.StringVar(&configFromFlags.Credentials.Cluster, "cluster", "", "")
+	flagSet.StringVar(&configFromFlags.Credentials.APIBaseURL, "api-base-url", "", "")
 	flagSet.StringVar(&configFromFlags.Credentials.APIToken, "api-token", "", "")
 
 	flagSet.Usage = func() {}
@@ -113,34 +107,26 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 
 	if configFileName != "" {
 		readConfigFromFile(&configFromFile, configFileName)
-		adoptConfig(target, &configFromFile, "FILE")
+		adoptConfig(target, &configFromFile)
 	}
 
-	adoptConfig(target, &configFromFlags, "FLAGS")
+	adoptConfig(target, &configFromFlags)
 
 	return nil
 }
 
-func adoptConfig(target *Config, source *Config, sourceName string) {
+func adoptConfig(target *Config, source *Config) {
 	if source.verbose {
-		// fmt.Println(".. adopting " + "verbose" + " from config " + sourceName)
 		target.verbose = source.verbose
 	}
 	if source.ListenPort != 0 {
-		// fmt.Println(".. adopting " + "ListenPort" + " from config " + sourceName)
 		target.ListenPort = source.ListenPort
 	}
-	if source.Credentials.EnvironmentID != "" {
-		// fmt.Println(".. adopting " + "EnvironmentID" + " from config " + sourceName)
-		target.Credentials.EnvironmentID = source.Credentials.EnvironmentID
+	if source.Credentials.APIBaseURL != "" {
+		target.Credentials.APIBaseURL = source.Credentials.APIBaseURL
 	}
 	if source.Credentials.APIToken != "" {
-		// fmt.Println(".. adopting " + "APIToken" + " from config " + sourceName)
 		target.Credentials.APIToken = source.Credentials.APIToken
-	}
-	if source.Credentials.Cluster != "" {
-		// fmt.Println(".. adopting " + "Cluster" + " from config " + sourceName)
-		target.Credentials.Cluster = source.Credentials.Cluster
 	}
 }
 
