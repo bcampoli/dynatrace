@@ -153,8 +153,6 @@ func fromJSON(config *Config, configFile *os.File) {
 		return
 	}
 
-	fmt.Println(string(bytes))
-
 	if err = json.Unmarshal(bytes, config); err != nil {
 		fmt.Println("[WARNING] " + err.Error())
 		return
@@ -166,7 +164,6 @@ func readConfigFromFile(config *Config, configFileName string) {
 	var configFile *os.File
 
 	if configFileName != "" {
-		fmt.Println("reading config file " + configFileName)
 		if _, err = os.Stat(configFileName); err == nil {
 			if configFile, err = os.Open(configFileName); err != nil {
 				fmt.Println("[WARNING] [os.Open]" + err.Error())

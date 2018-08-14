@@ -2,7 +2,7 @@
     "listenPort": 80,
     "credentials": {
         "//": "Leave this empty for SaaS Tenants",
-        "//": "For Managed Tenants use the first part of the Tenant Web URL (e.g. https://yoj211.managed-sprint.dynalabs.io/e for https://yoj211.managed-sprint.dynalabs.io/e/ecc29184-1ae2-46dd-96fe-06997671fc57)",
+        "//": "For Managed Tenants use the first part of the Tenant Web URL (e.g. https://yoj211.managed-sprint.dynalabs.io/e/ for https://yoj211.managed-sprint.dynalabs.io/e/ecc29184-1ae2-46dd-96fe-06997671fc57)",
         "cluster": "", 
         "//": "For SaaS Tenants this is the first part of your Tenant URL (e.g. siz65484 for https://siz65484.live.dynatrace.com)", 
         "//": "For Managed Tenants this is the last part of the Tenant URL (e.g. ecc29184-1ae2-46dd-96fe-06997671fc57 for https://yoj211.managed-sprint.dynalabs.io/e/ecc29184-1ae2-46dd-96fe-06997671fc57)",
