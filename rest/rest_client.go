@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -27,6 +28,7 @@ func (client *Client) Get(path string) ([]byte, error) {
 	if !strings.HasSuffix(apiBaseURL, "/") {
 		apiBaseURL = apiBaseURL + "/"
 	}
+	fmt.Println(apiBaseURL + path)
 	if request, err = http.NewRequest(http.MethodGet, apiBaseURL+path, nil); err != nil {
 		return make([]byte, 0), err
 	}
