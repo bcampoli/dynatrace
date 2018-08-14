@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -14,7 +15,10 @@ type Client struct {
 
 // NewClient TODO: documentation
 func NewClient(credentials *Credentials) *Client {
-	client := Client{}
+	tr := &http.Transport{
+		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	}
+	client := Client{Transport: tr}
 	client.credentials = credentials
 	return &client
 }
