@@ -37,7 +37,7 @@ func (handler *PrintHandler) Post(URL string, problem *problems.Problem) error {
 
 // Handle TODO: documentation
 func (handler *PrintHandler) Handle(problem *problems.Problem) error {
-	return handler.Post("http://postb.in/R06fBRsq", problem)
+	return handler.Post("https://webhook.site/ce45e42b-7fc4-4d21-9c24-753b1eba30d9", problem)
 }
 
 func main() {
