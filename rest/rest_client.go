@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"errors"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -39,6 +40,9 @@ func (client *Client) Get(path string) ([]byte, error) {
 	httpClient := &http.Client{}
 	if httpResponse, err = httpClient.Do(request); err != nil {
 		return make([]byte, 0), err
+	}
+	if httpResponse.StatusCode != http.StatusOK {
+		return nil, errors.New(http.StatusText(httpResponse.StatusCode))
 	}
 	return ioutil.ReadAll(httpResponse.Body)
 }
