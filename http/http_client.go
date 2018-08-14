@@ -28,3 +28,22 @@ func (client *Client) Post(URL string, body []byte) error {
 	ioutil.ReadAll(response.Body)
 	return nil
 }
+
+// Put TODO: documentation
+func (client *Client) Put(URL string, body []byte) error {
+	var err error
+	var response *nethttp.Response
+	var request *nethttp.Request
+	if request, err = nethttp.NewRequest(nethttp.MethodPut, URL, bytes.NewBuffer(body)); err != nil {
+		return err
+	}
+	request.Header.Set("Content-Type", "application/xml")
+
+	httpClient := &nethttp.Client{}
+	if response, err = httpClient.Do(request); err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	ioutil.ReadAll(response.Body)
+	return nil
+}
