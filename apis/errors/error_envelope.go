@@ -1,4 +1,4 @@
-package problems
+package errors
 
 // ErrorEnvelope TODO documentation
 type ErrorEnvelope struct {

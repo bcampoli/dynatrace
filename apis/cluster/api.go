@@ -1,4 +1,4 @@
-package problems
+package cluster
 
 import (
 	"encoding/json"
@@ -21,28 +21,27 @@ func NewAPI(credentials *rest.Credentials) *API {
 }
 
 // Get TODO: documentation
-func (api *API) Get(ID string) (*Problem, error) {
+func (api *API) Get() (string, error) {
 	var err error
 	var bytes []byte
-	var problemResult problemResult
+	var version Version
 	var errorEnvelope resterrors.ErrorEnvelope
 
-	if bytes, err = api.client.Get("/api/v1/problem/details/" + ID); err != nil {
+	if bytes, err = api.client.Get("/api/v1/config/clusterversion"); err != nil {
 		if bytes != nil {
 			var innerError error
 			if innerError = json.Unmarshal(bytes, &errorEnvelope); innerError == nil {
 				if errorEnvelope.Error.Message != "" {
-					return nil, errors.New(errorEnvelope.Error.Message)
+					return "", errors.New(errorEnvelope.Error.Message)
 				} else {
-					return nil, err
+					return "", err
 				}
 			}
 		}
-		return nil, err
+		return "", err
 	}
-	// fmt.Println(string(bytes))
-	if err = json.Unmarshal(bytes, &problemResult); err != nil {
-		return nil, err
+	if err = json.Unmarshal(bytes, &version); err != nil {
+		return "", err
 	}
-	return &problemResult.Result, nil
+	return version.Version, nil
 }
