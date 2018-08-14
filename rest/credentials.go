@@ -6,9 +6,9 @@ import (
 
 // Credentials TODO: documentation
 type Credentials struct {
-	Cluster       string
-	EnvironmentID string
-	APIToken      string
+	Cluster       string `json:"cluster,omitempty"`
+	EnvironmentID string `json:"environment,omitempty"`
+	APIToken      string `json:"api-token,omitempty"`
 }
 
 // NewSaasCredentials TODO: documentation

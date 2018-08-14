@@ -14,13 +14,13 @@ import (
 
 // Config TODO: documentation
 type Config struct {
-	ListenPort  int
-	Credentials *rest.Credentials
+	ListenPort  int              `json:"listenPort,omitempty"`
+	Credentials rest.Credentials `json:"credentials,omitempty"`
 	verbose     bool
 }
 
 // NewConfig TODO: documentation
-func NewConfig(listenPort int, credentials *rest.Credentials) *Config {
+func NewConfig(listenPort int, credentials rest.Credentials) *Config {
 	return &Config{ListenPort: listenPort, Credentials: credentials}
 }
 
@@ -30,7 +30,7 @@ func ParseConfig(flagset *flag.FlagSet) (*Config, error) {
 	var config Config
 	var err error
 
-	config = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
+	config = Config{ListenPort: 0, Credentials: rest.Credentials{}}
 
 	readConfigFromEnv(&config)
 	if err = readConfigFromFlags(&config, flagset, args); err != nil {
@@ -61,8 +61,6 @@ func readConfigFromEnv(target *Config) {
 	var cluster string
 	var err error
 
-	config = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
-
 	environmentID = os.Getenv("DT_NOTIFICATION_ENVIRONMENT")
 	if environmentID != "" {
 		config.Credentials.EnvironmentID = environmentID
@@ -92,9 +90,6 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 	var configFromFlags Config
 	var configFileName string
 	var err error
-
-	configFromFile = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
-	configFromFlags = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 
 	flagSet := flag.NewFlagSet(args[0], flag.ContinueOnError)
 
@@ -158,12 +153,12 @@ func fromJSON(config *Config, configFile *os.File) {
 		return
 	}
 
+	fmt.Println(string(bytes))
+
 	if err = json.Unmarshal(bytes, config); err != nil {
 		fmt.Println("[WARNING] " + err.Error())
 		return
 	}
-
-	return
 }
 
 func readConfigFromFile(config *Config, configFileName string) {
@@ -171,13 +166,16 @@ func readConfigFromFile(config *Config, configFileName string) {
 	var configFile *os.File
 
 	if configFileName != "" {
+		fmt.Println("reading config file " + configFileName)
 		if _, err = os.Stat(configFileName); err == nil {
 			if configFile, err = os.Open(configFileName); err != nil {
 				fmt.Println("[WARNING] [os.Open]" + err.Error())
 				return
 			}
-			defer configFile.Close()
 			fromJSON(config, configFile)
+			configFile.Close()
+		} else {
+			fmt.Println("some error happened: ", err.Error())
 		}
 	}
 }
