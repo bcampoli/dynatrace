@@ -92,12 +92,6 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 	var configFileName string
 	var err error
 
-	// fmt.Println("-------")
-	// for _, arg := range args {
-	// 	fmt.Println(arg)
-	// }
-	// fmt.Println("-------")
-
 	configFromFile = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 	configFromFlags = Config{ListenPort: 0, Credentials: &rest.Credentials{}}
 

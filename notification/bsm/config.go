@@ -9,7 +9,7 @@ import (
 	"github.com/dtcookie/dynatrace/notification"
 )
 
-func parseConfig(handler *SOAPHandler) *notification.Config {
+func parseConfig(handler *BSMhandler) *notification.Config {
 	var err error
 	var config *notification.Config
 
