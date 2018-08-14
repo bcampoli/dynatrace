@@ -2,6 +2,7 @@ package problems
 
 import (
 	"encoding/json"
+	"errors"
 
 	"github.com/dtcookie/dynatrace/rest"
 )
@@ -23,7 +24,19 @@ func (api *API) Get(ID string) (*Problem, error) {
 	var err error
 	var bytes []byte
 	var problemResult problemResult
+	var errorEnvelope ErrorEnvelope
+
 	if bytes, err = api.client.Get("/api/v1/problem/details/" + ID); err != nil {
+		if bytes != nil {
+			var innerError error
+			if innerError = json.Unmarshal(bytes, &errorEnvelope); innerError == nil {
+				if errorEnvelope.Error.Message != "" {
+					return nil, errors.New(errorEnvelope.Error.Message)
+				} else {
+					return nil, err
+				}
+			}
+		}
 		return nil, err
 	}
 	// fmt.Println(string(bytes))

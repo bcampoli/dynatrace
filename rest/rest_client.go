@@ -24,6 +24,8 @@ func (client *Client) Get(path string) ([]byte, error) {
 	var err error
 	var httpResponse *http.Response
 	var request *http.Request
+	var bytes []byte
+
 	apiBaseURL := client.credentials.APIBaseURL
 	if !strings.HasSuffix(apiBaseURL, "/") {
 		apiBaseURL = apiBaseURL + "/"
@@ -42,7 +44,12 @@ func (client *Client) Get(path string) ([]byte, error) {
 		return make([]byte, 0), err
 	}
 	if httpResponse.StatusCode != http.StatusOK {
-		return nil, errors.New(http.StatusText(httpResponse.StatusCode) + " (GET " + apiBaseURL + path + ")")
+		finalError := errors.New(http.StatusText(httpResponse.StatusCode) + " (GET " + apiBaseURL + path + ")")
+		if bytes, err = ioutil.ReadAll(httpResponse.Body); err != nil {
+			return nil, finalError
+		} else {
+			return bytes, finalError
+		}
 	}
 	return ioutil.ReadAll(httpResponse.Body)
 }
