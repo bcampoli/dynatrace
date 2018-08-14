@@ -1,6 +1,8 @@
 package main
 
 import (
+	"fmt"
+
 	"github.com/dtcookie/dynatrace/http"
 	"github.com/dtcookie/dynatrace/notification/xml"
 )
@@ -14,5 +16,9 @@ type BSMhandler struct {
 
 // Handle TODO: documentation
 func (handler *BSMhandler) Handle(xml string) error {
-	return handler.client.Post(handler.Target, []byte(xml))
+	if false {
+		return handler.client.Post(handler.Target, []byte(xml))
+	}
+	fmt.Println(xml)
+	return nil
 }
