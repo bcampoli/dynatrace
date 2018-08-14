@@ -90,7 +90,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	problemAPI := problems.NewAPI(&listener.config.Credentials)
 	var problem *problems.Problem
 	if problem, err = problemAPI.Get(defNotification.PID); err != nil {
-		fmt.Println(err.Error())
+		log.Warn("querying for problem details failed: " + err.Error())
 		return
 	}
 
