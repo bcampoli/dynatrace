@@ -29,7 +29,7 @@ func (listener *listener) listen() {
 	flagSet.Parse(os.Args)
 
 	http.HandleFunc("/", listener.handleHTTP)
-	fmt.Println(fmt.Sprintf("Listening on port %d for incoming problem notifications.", listener.config.ListenPort))
+	log.Info(fmt.Sprintf("Listening on port %d for incoming problem notifications.", listener.config.ListenPort))
 	http.ListenAndServe(fmt.Sprintf(":%d", listener.config.ListenPort), nil)
 }
 
