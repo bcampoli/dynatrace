@@ -16,6 +16,7 @@ import (
 type Config struct {
 	ListenPort  int
 	Credentials *rest.Credentials
+	verbose     bool
 }
 
 // NewConfig TODO: documentation
@@ -103,6 +104,7 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 		})
 	}
 
+	flagSet.BoolVar(&configFromFlags.verbose, "v", false, "")
 	flagSet.StringVar(&configFileName, "config", "", "")
 	flagSet.IntVar(&configFromFlags.ListenPort, "listen", 0, "")
 	flagSet.StringVar(&configFromFlags.Credentials.EnvironmentID, "environment", "", "")
@@ -125,6 +127,10 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 }
 
 func adoptConfig(target *Config, source *Config, sourceName string) {
+	if source.verbose {
+		// fmt.Println(".. adopting " + "verbose" + " from config " + sourceName)
+		target.verbose = source.verbose
+	}
 	if source.ListenPort != 0 {
 		// fmt.Println(".. adopting " + "ListenPort" + " from config " + sourceName)
 		target.ListenPort = source.ListenPort

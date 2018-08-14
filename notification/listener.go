@@ -2,11 +2,9 @@ package notification
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 
 	"github.com/dtcookie/dynatrace/apis/problems"
 	"github.com/dtcookie/dynatrace/log"
@@ -20,14 +18,9 @@ func newListener(config *Config, handler Handler) *listener {
 type listener struct {
 	handler Handler
 	config  *Config
-	verbose bool
 }
 
 func (listener *listener) listen() {
-	flagSet := flag.NewFlagSet(os.Args[0], flag.ContinueOnError)
-	flagSet.BoolVar(&listener.verbose, "v", false, "")
-	flagSet.Parse(os.Args)
-
 	http.HandleFunc("/", listener.handleHTTP)
 	log.Info(fmt.Sprintf("Listening on port %d for incoming problem notifications.", listener.config.ListenPort))
 	http.ListenAndServe(fmt.Sprintf(":%d", listener.config.ListenPort), nil)
@@ -38,14 +31,14 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	var body []byte
 
 	if request.Method != http.MethodPost {
-		if listener.verbose {
+		if listener.config.verbose {
 			log.Warn(request.Method + " responding with " + http.StatusText(http.StatusMethodNotAllowed))
 		}
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 	if request.ContentLength == 0 {
-		if listener.verbose {
+		if listener.config.verbose {
 			log.Warn("responding with " + http.StatusText(http.StatusBadRequest))
 		}
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": missing request body", http.StatusBadRequest)
@@ -54,7 +47,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	var contentType string
 	contentType = request.Header.Get("content-type")
 	if contentType != "application/json" {
-		if listener.verbose {
+		if listener.config.verbose {
 			log.Warn("responding with " + http.StatusText(http.StatusBadRequest) + ": expected content-type 'application/json'")
 		}
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": expected content-type 'application/json'", http.StatusBadRequest)
@@ -72,7 +65,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	if listener.verbose {
+	if listener.config.verbose {
 		log.Info("received problem notification " + toJSON(defNotification))
 	}
 	if (defNotification.Title == "Dynatrace problem notification test run") || (defNotification.PID == "999999") {
@@ -81,13 +74,13 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	}
 
 	if defNotification.PID == "" {
-		if listener.verbose {
+		if listener.config.verbose {
 			log.Warn("no PID included. Cannot query for details, sorry.")
 		}
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		return
 	}
-	if listener.verbose {
+	if listener.config.verbose {
 		log.Info("querying for problem details")
 	}
 	problemAPI := problems.NewAPI(listener.config.Credentials)
