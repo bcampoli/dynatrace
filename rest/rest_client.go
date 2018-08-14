@@ -15,10 +15,11 @@ type Client struct {
 
 // NewClient TODO: documentation
 func NewClient(credentials *Credentials) *Client {
-	tr := &http.Transport{
-		TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	}
-	client := Client{Transport: tr}
+	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	// tr := &http.Transport{
+	// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	// }
+	client := Client{}
 	client.credentials = credentials
 	return &client
 }
