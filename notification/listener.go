@@ -40,10 +40,6 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	var err error
 	var body []byte
 
-	listener.config.verbose = true
-
-	fmt.Println("received")
-
 	if request.Method != http.MethodPost {
 		if listener.config.verbose {
 			log.Warn(request.Method + " responding with " + http.StatusText(http.StatusMethodNotAllowed))
