@@ -21,7 +21,7 @@ type Config struct {
 
 // NewConfig TODO: documentation
 func NewConfig(listenPort int, credentials rest.Credentials) *Config {
-	return &Config{ListenPort: listenPort, Credentials: credentials}
+	return &Config{ListenPort: listenPort, Credentials: credentials, verbose: true}
 }
 
 // ParseConfig TODO: documentation
