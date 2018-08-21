@@ -45,7 +45,7 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 
 	fmt.Println(xmlStr)
 
-	return nil
+	return handler.client.Post(handler.Target, []byte(xmlStr))
 }
 
 func toJSON(v interface{}) (string, error) {
