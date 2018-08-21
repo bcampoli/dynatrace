@@ -105,7 +105,8 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	listener.handler.Handle(problem)
+	problemEvent := ProblemEvent{Notification: &defNotification, Problem: problem}
+	listener.handler.Handle(&problemEvent)
 
 	http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 }

@@ -3,7 +3,6 @@ package xml
 import (
 	"encoding/xml"
 
-	"github.com/dtcookie/dynatrace/apis/problems"
 	"github.com/dtcookie/dynatrace/notification"
 )
 
@@ -18,10 +17,10 @@ func NewXMLAdapter(handler Handler) notification.Handler {
 }
 
 // Handle TODO: documentation
-func (adapter *xmlAdapter) Handle(problem *problems.Problem) error {
+func (adapter *xmlAdapter) Handle(event *notification.ProblemEvent) error {
 	var err error
 	var xml string
-	if xml, err = toXML(problem); err != nil {
+	if xml, err = toXML(event.Problem); err != nil {
 		return err
 	}
 	return adapter.handler.Handle(xml)

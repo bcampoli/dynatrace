@@ -1,12 +1,8 @@
 package notification
 
-import (
-	"github.com/dtcookie/dynatrace/apis/problems"
-)
-
 // Handler TODO: documentation
 type Handler interface {
-	Handle(problem *problems.Problem) error
+	Handle(event *ProblemEvent) error
 }
 
 // NewHandler TODO: documentation
@@ -19,6 +15,6 @@ type hub struct {
 	next Handler
 }
 
-func (hub *hub) Handle(problem *problems.Problem) error {
-	return hub.next.Handle(problem)
+func (hub *hub) Handle(event *ProblemEvent) error {
+	return hub.next.Handle(event)
 }

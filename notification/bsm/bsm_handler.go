@@ -4,21 +4,21 @@ import (
 	"fmt"
 
 	"github.com/dtcookie/dynatrace/http"
-	"github.com/dtcookie/dynatrace/notification/xml"
+	"github.com/dtcookie/dynatrace/notification/json"
 )
 
-// SOAPHandler TODO: documentation
+// BSMhandler TODO: documentation
 type BSMhandler struct {
-	xml.Handler
+	json.Handler
 	Target string
 	client *http.Client
 }
 
 // Handle TODO: documentation
-func (handler *BSMhandler) Handle(xml string) error {
+func (handler *BSMhandler) Handle(jsonstr string) error {
 	if false {
-		return handler.client.Post(handler.Target, []byte(xml))
+		return handler.client.Post(handler.Target, []byte(jsonstr))
 	}
-	fmt.Println(xml)
+	fmt.Println(jsonstr)
 	return nil
 }
