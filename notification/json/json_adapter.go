@@ -20,7 +20,7 @@ func NewJSONAdapter(handler Handler) notification.Handler {
 func (adapter *jsonAdapter) Handle(event *notification.ProblemEvent) error {
 	var err error
 	var jsonstr string
-	if jsonstr, err = toJSON(event.Problem); err != nil {
+	if jsonstr, err = toJSON(event); err != nil {
 		return err
 	}
 	return adapter.handler.Handle(jsonstr)
