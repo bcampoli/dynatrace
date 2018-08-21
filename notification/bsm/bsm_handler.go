@@ -25,6 +25,26 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 		return handler.client.Post(handler.Target, []byte(jsonstr))
 	}
 	fmt.Println(jsonstr)
+	fmt.Println()
+
+	xmlStr := ""
+
+	xmlStr = xmlStr + "<xml>"
+	xmlStr = xmlStr + "<BSMCEvent>"
+	xmlStr = xmlStr + "  <Title>" + event.Notification.Title + "</Title>"
+	xmlStr = xmlStr + "  <Description>" + event.Notification.URL + "</Description>"
+	xmlStr = xmlStr + "  <PID>" + event.Notification.PID + "</PID>"
+	xmlStr = xmlStr + "  <Severity>" + "Critical" + "</Severity>"
+	xmlStr = xmlStr + "  <RelatedCI>" + "UNKNOWN" + "</RelatedCI>"
+	// xmlStr = xmlStr + "  <timeStamp>12/13/17 08:59:57 AM</timeStamp>"
+	// xmlStr = xmlStr + "  <impact>neglectable</impact>"
+	// xmlStr = xmlStr + "  <category>DT Managed</category>"
+	// xmlStr = xmlStr + "  <relatedEntity>dcobel</relatedEntity>"
+	xmlStr = xmlStr + "</BSMCEvent>"
+	xmlStr = xmlStr + "</xml>"
+
+	fmt.Println(xmlStr)
+
 	return nil
 }
 
