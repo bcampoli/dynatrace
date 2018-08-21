@@ -2,7 +2,6 @@ package main
 
 import (
 	"github.com/dtcookie/dynatrace/notification"
-	"github.com/dtcookie/dynatrace/notification/json"
 )
 
 func main() {
@@ -13,5 +12,5 @@ func main() {
 		return
 	}
 
-	notification.Listen(config, json.NewJSONAdapter(&handler))
+	notification.Listen(config, &handler)
 }
