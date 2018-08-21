@@ -29,18 +29,18 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 
 	xmlStr := ""
 
-	xmlStr = xmlStr + "<xml>"
-	xmlStr = xmlStr + "<BSMCEvent>"
-	xmlStr = xmlStr + "  <Title>" + event.Notification.Title + "</Title>"
-	xmlStr = xmlStr + "  <Description>" + event.Notification.URL + "</Description>"
-	xmlStr = xmlStr + "  <PID>" + event.Notification.PID + "</PID>"
-	xmlStr = xmlStr + "  <Severity>" + "Critical" + "</Severity>"
-	xmlStr = xmlStr + "  <RelatedCI>" + "UNKNOWN" + "</RelatedCI>"
+	xmlStr = xmlStr + "<xml>\n"
+	xmlStr = xmlStr + "<BSMCEvent>\n"
+	xmlStr = xmlStr + "  <Title>" + event.Notification.Title + "</Title>\n"
+	xmlStr = xmlStr + "  <Description>" + event.Notification.URL + "</Description>\n"
+	xmlStr = xmlStr + "  <PID>" + event.Notification.PID + "</PID>\n"
+	xmlStr = xmlStr + "  <Severity>" + "Critical" + "</Severity>\n"
+	xmlStr = xmlStr + "  <RelatedCI>" + "UNKNOWN" + "</RelatedCI>\n"
 	// xmlStr = xmlStr + "  <timeStamp>12/13/17 08:59:57 AM</timeStamp>"
 	// xmlStr = xmlStr + "  <impact>neglectable</impact>"
 	// xmlStr = xmlStr + "  <category>DT Managed</category>"
 	// xmlStr = xmlStr + "  <relatedEntity>dcobel</relatedEntity>"
-	xmlStr = xmlStr + "</BSMCEvent>"
+	xmlStr = xmlStr + "</BSMCEvent>\n"
 	xmlStr = xmlStr + "</xml>"
 
 	fmt.Println(xmlStr)
