@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/dtcookie/dynatrace/notification"
-	"github.com/dtcookie/dynatrace/notification/xml"
+	"github.com/dtcookie/dynatrace/notification/json"
 )
 
 func main() {
@@ -13,5 +13,5 @@ func main() {
 		return
 	}
 
-	notification.Listen(config, xml.NewXMLAdapter(&handler))
+	notification.Listen(config, json.NewJSONAdapter(&handler))
 }
