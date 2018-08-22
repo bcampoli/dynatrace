@@ -9,23 +9,32 @@ import (
 	"github.com/dtcookie/dynatrace/apis/cluster"
 	"github.com/dtcookie/dynatrace/apis/problems"
 	"github.com/dtcookie/dynatrace/log"
+	"github.com/dtcookie/dynatrace/rest"
 )
 
 func newListener(config *Config, handler Handler) *listener {
-	return &listener{config: config, handler: handler}
+	var restConfig rest.Config
+	if config.Insecure {
+		restConfig.Insecure = true
+	}
+	if config.NoProxy {
+		restConfig.NoProxy = true
+	}
+	return &listener{config: config, restConfig: &restConfig, handler: handler}
 }
 
 // listener TODO: documentation
 type listener struct {
-	handler Handler
-	config  *Config
+	handler    Handler
+	restConfig *rest.Config
+	config     *Config
 }
 
 func (listener *listener) listen() {
 	var clusterVersion string
 	var err error
 
-	clusterAPI := cluster.NewAPI(&listener.config.Credentials)
+	clusterAPI := cluster.NewAPI(listener.restConfig, &listener.config.Credentials)
 	if clusterVersion, err = clusterAPI.Get(); err != nil {
 		log.Error(err)
 		return
@@ -41,14 +50,14 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	var body []byte
 
 	if request.Method != http.MethodPost {
-		if listener.config.verbose {
+		if listener.config.Verbose {
 			log.Warn(request.Method + " responding with " + http.StatusText(http.StatusMethodNotAllowed))
 		}
 		http.Error(w, http.StatusText(http.StatusMethodNotAllowed), http.StatusMethodNotAllowed)
 		return
 	}
 	if request.ContentLength == 0 {
-		if listener.config.verbose {
+		if listener.config.Verbose {
 			log.Warn("responding with " + http.StatusText(http.StatusBadRequest))
 		}
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": missing request body", http.StatusBadRequest)
@@ -57,7 +66,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	var contentType string
 	contentType = request.Header.Get("content-type")
 	if contentType != "application/json" {
-		if listener.config.verbose {
+		if listener.config.Verbose {
 			log.Warn("responding with " + http.StatusText(http.StatusBadRequest) + ": expected content-type 'application/json'")
 		}
 		http.Error(w, http.StatusText(http.StatusBadRequest)+": expected content-type 'application/json'", http.StatusBadRequest)
@@ -80,7 +89,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		return
 	}
 
-	if listener.config.verbose {
+	if listener.config.Verbose {
 		log.Info("received problem notification " + toJSON(defNotification))
 	} else {
 		if defNotification.PID != "" {
@@ -89,16 +98,16 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	}
 
 	if defNotification.PID == "" {
-		if listener.config.verbose {
+		if listener.config.Verbose {
 			log.Warn("received problem notification without PID")
 		}
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		return
 	}
-	if listener.config.verbose {
+	if listener.config.Verbose {
 		log.Info("querying for problem details")
 	}
-	problemAPI := problems.NewAPI(&listener.config.Credentials)
+	problemAPI := problems.NewAPI(listener.restConfig, &listener.config.Credentials)
 	var problem *problems.Problem
 	if problem, err = problemAPI.Get(defNotification.PID); err != nil {
 		log.Warn("querying for problem details failed: " + err.Error())

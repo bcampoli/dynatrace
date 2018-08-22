@@ -16,7 +16,9 @@ import (
 type Config struct {
 	ListenPort  int              `json:"listenPort,omitempty"`
 	Credentials rest.Credentials `json:"credentials,omitempty"`
-	verbose     bool
+	NoProxy     bool             `json:"noproxy,omitempty"`
+	Insecure    bool             `json:"insecure,omitempty"`
+	Verbose     bool             `json:"verbose,omitempty"`
 }
 
 // NewConfig TODO: documentation
@@ -94,7 +96,9 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 		})
 	}
 
-	flagSet.BoolVar(&configFromFlags.verbose, "v", false, "")
+	flagSet.BoolVar(&configFromFlags.Verbose, "v", false, "")
+	flagSet.BoolVar(&configFromFlags.Insecure, "insecure", false, "")
+	flagSet.BoolVar(&configFromFlags.NoProxy, "noproxy", false, "")
 	flagSet.StringVar(&configFileName, "config", "", "")
 	flagSet.IntVar(&configFromFlags.ListenPort, "listen", 0, "")
 	flagSet.StringVar(&configFromFlags.Credentials.APIBaseURL, "api-base-url", "", "")
@@ -116,8 +120,8 @@ func readConfigFromFlags(target *Config, parentFlags *flag.FlagSet, args []strin
 }
 
 func adoptConfig(target *Config, source *Config) {
-	if source.verbose {
-		target.verbose = source.verbose
+	if source.Verbose {
+		target.Verbose = source.Verbose
 	}
 	if source.ListenPort != 0 {
 		target.ListenPort = source.ListenPort

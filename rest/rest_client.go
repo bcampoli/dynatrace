@@ -1,6 +1,7 @@
 package rest
 
 import (
+	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -9,17 +10,19 @@ import (
 
 // Client TODO: documentation
 type Client struct {
+	config      *Config
 	credentials *Credentials
 }
 
 // NewClient TODO: documentation
-func NewClient(credentials *Credentials) *Client {
+func NewClient(config *Config, credentials *Credentials) *Client {
 	// http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	// tr := &http.Transport{
 	// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	// }
 	client := Client{}
 	client.credentials = credentials
+	client.config = config
 	return &client
 }
 
@@ -43,11 +46,32 @@ func (client *Client) Get(path string) ([]byte, error) {
 	if err = client.credentials.Authenticate(request); err != nil {
 		return make([]byte, 0), err
 	}
-	httpClient := &http.Client{
-	// Transport: &http.Transport{
-	// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-	// 	Proxy:           http.ProxyURL(nil),
-	// },
+	var httpClient *http.Client
+	if client.config.NoProxy {
+		if client.config.Insecure {
+			httpClient = &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+					Proxy:           http.ProxyURL(nil),
+				},
+			}
+		} else {
+			httpClient = &http.Client{
+				Transport: &http.Transport{
+					Proxy: http.ProxyURL(nil),
+				},
+			}
+		}
+	} else {
+		if client.config.Insecure {
+			httpClient = &http.Client{
+				Transport: &http.Transport{
+					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+				},
+			}
+		} else {
+			httpClient = &http.Client{}
+		}
 	}
 	if httpResponse, err = httpClient.Do(request); err != nil {
 		return make([]byte, 0), err

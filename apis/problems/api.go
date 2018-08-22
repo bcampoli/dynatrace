@@ -14,9 +14,9 @@ type API struct {
 }
 
 // NewAPI TODO: documentation
-func NewAPI(credentials *rest.Credentials) *API {
+func NewAPI(config *rest.Config, credentials *rest.Credentials) *API {
 	return &API{
-		client: rest.NewClient(credentials),
+		client: rest.NewClient(config, credentials),
 	}
 }
 
