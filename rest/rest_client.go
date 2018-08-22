@@ -80,9 +80,8 @@ func (client *Client) Get(path string) ([]byte, error) {
 		finalError := errors.New(http.StatusText(httpResponse.StatusCode) + " (GET " + apiBaseURL + path + ")")
 		if bytes, err = ioutil.ReadAll(httpResponse.Body); err != nil {
 			return nil, finalError
-		} else {
-			return bytes, finalError
 		}
+		return bytes, finalError
 	}
 	return ioutil.ReadAll(httpResponse.Body)
 }
