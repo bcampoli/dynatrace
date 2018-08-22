@@ -31,7 +31,7 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 
 	bsmEvent := Event{
 		Title:         event.Notification.Title,
-		Description:   "\"" + event.Notification.URL + "\"",
+		Description:   "For detailed information visit: " + event.Notification.URL,
 		PID:           event.Notification.PID,
 		Severity:      event.Notification.State,
 		RelatedEntity: event.Notification.Tags,
