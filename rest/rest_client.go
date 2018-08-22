@@ -1,7 +1,6 @@
 package rest
 
 import (
-	"crypto/tls"
 	"errors"
 	"io/ioutil"
 	"net/http"
@@ -45,10 +44,10 @@ func (client *Client) Get(path string) ([]byte, error) {
 		return make([]byte, 0), err
 	}
 	httpClient := &http.Client{
-		Transport: &http.Transport{
-			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-			Proxy:           http.ProxyURL(nil),
-		},
+	// Transport: &http.Transport{
+	// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+	// 	Proxy:           http.ProxyURL(nil),
+	// },
 	}
 	if httpResponse, err = httpClient.Do(request); err != nil {
 		return make([]byte, 0), err
