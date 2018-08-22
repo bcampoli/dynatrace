@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"encoding/xml"
 	"fmt"
 
 	"github.com/dtcookie/dynatrace/http"
@@ -15,6 +16,7 @@ type BSMhandler struct {
 	client *http.Client
 }
 
+// Handle TODO: documentation
 func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 	var err error
 	var jsonstr string
@@ -27,26 +29,38 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 	fmt.Println(jsonstr)
 	fmt.Println()
 
-	xmlStr := ""
+	bsmEvent := Event{
+		Title:         event.Notification.Title,
+		Description:   "\"" + event.Notification.URL + "\"",
+		PID:           event.Notification.PID,
+		Severity:      event.Notification.State,
+		RelatedEntity: event.Notification.Tags,
+	}
 
-	xmlStr = xmlStr + "<Event>\n"
-	xmlStr = xmlStr + "  <title>" + event.Notification.Title + "</title>\n"
-	xmlStr = xmlStr + "  <description>\"" + event.Notification.URL + "\"</description>\n"
-	xmlStr = xmlStr + "  <PID>" + event.Notification.PID + "</PID>\n"
-	xmlStr = xmlStr + "  <severity>" + event.Notification.State + "</severity>\n"
-	xmlStr = xmlStr + "  <relatedEntity>" + event.Notification.Tags + "</relatedEntity>\n"
-	xmlStr = xmlStr + "</Event>"
-
+	xmlStr, err := toXML(&bsmEvent)
 	fmt.Println(xmlStr)
 
-	fmt.Println("Sending to " + handler.Target)
-	return handler.client.Post(handler.Target, []byte(xmlStr))
+	if err != nil {
+		fmt.Println("Sending to " + handler.Target)
+		return handler.client.Post(handler.Target, []byte(xmlStr))
+	}
+
+	return err
 }
 
 func toJSON(v interface{}) (string, error) {
 	var err error
 	var bytes []byte
 	if bytes, err = json.MarshalIndent(v, "", "  "); err != nil {
+		return "", err
+	}
+	return string(bytes), nil
+}
+
+func toXML(v interface{}) (string, error) {
+	var err error
+	var bytes []byte
+	if bytes, err = xml.MarshalIndent(v, "", "  "); err != nil {
 		return "", err
 	}
 	return string(bytes), nil
