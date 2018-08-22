@@ -30,11 +30,11 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 	xmlStr := ""
 
 	xmlStr = xmlStr + "<Event>\n"
-	xmlStr = xmlStr + "  <Title>" + event.Notification.Title + "</Title>\n"
-	xmlStr = xmlStr + "  <Description>" + event.Notification.URL + "</Description>\n"
+	xmlStr = xmlStr + "  <title>" + event.Notification.Title + "</title>\n"
+	xmlStr = xmlStr + "  <description>\"" + event.Notification.URL + "\"</description>\n"
 	xmlStr = xmlStr + "  <PID>" + event.Notification.PID + "</PID>\n"
-	xmlStr = xmlStr + "  <Severity>" + event.Notification.State + "</Severity>\n"
-	xmlStr = xmlStr + "  <RelatedCI>" + event.Notification.Tags + "</RelatedCI>\n"
+	xmlStr = xmlStr + "  <severity>" + event.Notification.State + "</severity>\n"
+	xmlStr = xmlStr + "  <relatedEntity>" + event.Notification.Tags + "</relatedEntity>\n"
 	xmlStr = xmlStr + "</Event>"
 
 	fmt.Println(xmlStr)

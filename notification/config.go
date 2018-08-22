@@ -126,6 +126,12 @@ func adoptConfig(target *Config, source *Config) {
 	if source.ListenPort != 0 {
 		target.ListenPort = source.ListenPort
 	}
+	if source.NoProxy {
+		target.NoProxy = source.NoProxy
+	}
+	if source.Insecure {
+		target.Insecure = source.Insecure
+	}
 	if source.Credentials.APIBaseURL != "" {
 		target.Credentials.APIBaseURL = source.Credentials.APIBaseURL
 	}
