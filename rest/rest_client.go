@@ -15,7 +15,7 @@ type Client struct {
 
 // NewClient TODO: documentation
 func NewClient(credentials *Credentials) *Client {
-	http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	// http.DefaultTransport.(*http.Transport).TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	// tr := &http.Transport{
 	// 	TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
 	// }
@@ -44,7 +44,12 @@ func (client *Client) Get(path string) ([]byte, error) {
 	if err = client.credentials.Authenticate(request); err != nil {
 		return make([]byte, 0), err
 	}
-	httpClient := &http.Client{}
+	httpClient := &http.Client{
+		Transport: &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
+			Proxy:           http.ProxyURL(nil),
+		},
+	}
 	if httpResponse, err = httpClient.Do(request); err != nil {
 		return make([]byte, 0), err
 	}
