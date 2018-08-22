@@ -3,7 +3,6 @@ package rest
 import (
 	"crypto/tls"
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -48,8 +47,6 @@ func (client *Client) Get(path string) ([]byte, error) {
 		return make([]byte, 0), err
 	}
 	var httpClient *http.Client
-	fmt.Println("nopoxy: ")
-	fmt.Println(client.config.NoProxy)
 	if client.config.NoProxy {
 		if client.config.Insecure {
 			httpClient = &http.Client{
