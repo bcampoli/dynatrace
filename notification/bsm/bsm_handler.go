@@ -35,6 +35,7 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 	var bcode string
 	barcodes := strings.Split(tags, ",")
 	for _, barcode := range barcodes {
+		barcode = strings.Trim(barcode, " ")
 		if strings.HasPrefix(barcode, "APP=") {
 			idxOpenBrace := strings.LastIndex(barcode, "(")
 			if (idxOpenBrace > 0) && (idxOpenBrace < len(barcode)) {
@@ -48,7 +49,7 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 		}
 	}
 
-	if bcode == "" {
+	if len(bcode) != 3 {
 		fmt.Println("No barcode found in " + event.Notification.Tags)
 		return nil
 	}
