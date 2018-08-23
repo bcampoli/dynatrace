@@ -35,7 +35,9 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 	var bcode string
 	barcodes := strings.Split(tags, ",")
 	for _, barcode := range barcodes {
+		fmt.Println("barcode: " + barcode)
 		barcode = strings.Trim(barcode, " ")
+		fmt.Println("barcode (trimmed): " + barcode)
 		if strings.HasPrefix(barcode, "APP=") {
 			idxOpenBrace := strings.LastIndex(barcode, "(")
 			if (idxOpenBrace > 0) && (idxOpenBrace < len(barcode)) {
