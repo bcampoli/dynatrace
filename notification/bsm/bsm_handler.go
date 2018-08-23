@@ -1,10 +1,10 @@
 package main
 
 import (
-	"strings"
 	"encoding/json"
 	"encoding/xml"
 	"fmt"
+	"strings"
 
 	"github.com/dtcookie/dynatrace/http"
 	"github.com/dtcookie/dynatrace/notification"
@@ -31,17 +31,16 @@ func (handler *BSMhandler) Handle(event *notification.ProblemEvent) error {
 	fmt.Println()
 
 	var tags string
-	tags = strings.Trim(event.Notification.Tags)
-	var barcode string
+	tags = strings.Trim(event.Notification.Tags, " ")
 	var bcode string
 	barcodes := strings.Split(tags, ",")
 	for _, barcode := range barcodes {
 		if strings.HasPrefix(barcode, "APP=") {
 			idxOpenBrace := strings.LastIndex(barcode, "(")
 			if (idxOpenBrace > 0) && (idxOpenBrace < len(barcode)) {
-				barcode = barcode[idxOpenBrace + 1: len(barcode)]
+				barcode = barcode[idxOpenBrace+1 : len(barcode)]
 				if strings.HasSuffix(barcode, ")") {
-					barcode = barcode[0: len(barcode) = 1]
+					barcode = barcode[0 : len(barcode)-1]
 					bcode = barcode
 					break
 				}
