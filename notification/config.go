@@ -14,15 +14,22 @@ import (
 
 // Config TODO: documentation
 type Config struct {
-	ListenPort  int              `json:"listenPort,omitempty"`
-	Credentials rest.Credentials `json:"credentials,omitempty"`
-	NoProxy     bool             `json:"noproxy,omitempty"`
-	Insecure    bool             `json:"insecure,omitempty"`
-	Verbose     bool             `json:"verbose,omitempty"`
+	ListenPort  int         `json:"listenPort,omitempty"`
+	Credentials Credentials `json:"credentials,omitempty"`
+	NoProxy     bool        `json:"noproxy,omitempty"`
+	Insecure    bool        `json:"insecure,omitempty"`
+	Verbose     bool        `json:"verbose,omitempty"`
+}
+
+// Credentials TODO: documentation
+type Credentials struct {
+	rest.Credentials
+	APIBaseURL string `json:"api-base-url,omitempty"`
+	APIToken   string `json:"api-token,omitempty"`
 }
 
 // NewConfig TODO: documentation
-func NewConfig(listenPort int, credentials rest.Credentials) *Config {
+func NewConfig(listenPort int, credentials Credentials) *Config {
 	return &Config{ListenPort: listenPort, Credentials: credentials}
 }
 
@@ -32,7 +39,7 @@ func ParseConfig(flagset *flag.FlagSet) (*Config, error) {
 	var config Config
 	var err error
 
-	config = Config{ListenPort: 0, Credentials: rest.Credentials{}}
+	config = Config{ListenPort: 0, Credentials: Credentials{}}
 
 	readConfigFromEnv(&config)
 	if err = readConfigFromFlags(&config, flagset, args); err != nil {
