@@ -91,7 +91,8 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	}
 
 	if listener.config.Verbose {
-		log.Info("received problem notification " + toJSON(defNotification))
+		log.Info("received problem notification " + request.RequestURI)
+		log.Info(toJSON(defNotification))
 	} else {
 		if defNotification.PID != "" {
 			log.Info("received problem notification for PID " + defNotification.PID)
@@ -110,9 +111,18 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	}
 	problemAPI := problems.NewAPI(listener.restConfig, &listener.config.Credentials)
 	var problem *problems.Problem
-	if problem, err = problemAPI.Get(defNotification.PID); err != nil {
-		log.Warn("querying for problem details failed: " + err.Error())
-		return
+	numAttempts := 0
+
+	for numAttempts < 5 {
+		if problem, err = problemAPI.Get(defNotification.PID); err != nil {
+			numAttempts++
+			if numAttempts == 5 {
+				log.Warn("querying for problem details failed: " + err.Error())
+				return
+			}
+		} else {
+			numAttempts = 5
+		}
 	}
 
 	problemEvent := ProblemEvent{Notification: &defNotification, Problem: problem}
