@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"strings"
 
 	"github.com/dtcookie/dynatrace/apis/cluster"
 	"github.com/dtcookie/dynatrace/apis/problems"
@@ -65,7 +66,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 	}
 	var contentType string
 	contentType = request.Header.Get("content-type")
-	if contentType != "application/json" {
+	if !strings.Contains(contentType, "application/json") {
 		if listener.config.Verbose {
 			log.Warn("responding with " + http.StatusText(http.StatusBadRequest) + ": expected content-type 'application/json'")
 		}
