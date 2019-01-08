@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/dtcookie/dynatrace/apis/cluster"
 	"github.com/dtcookie/dynatrace/apis/problems"
@@ -110,23 +111,26 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		log.Info("querying for problem details")
 	}
 	problemAPI := problems.NewAPI(listener.restConfig, &listener.config.Credentials)
-	var problem *problems.Problem
-	numAttempts := 0
+	go func(problemAPI *problems.API) {
+		var problem *problems.Problem
+		numAttempts := 0
 
-	for numAttempts < 5 {
-		if problem, err = problemAPI.Get(defNotification.PID); err != nil {
-			numAttempts++
-			if numAttempts == 5 {
-				log.Warn("querying for problem details failed: " + err.Error())
-				return
+		for numAttempts < 25 {
+			if problem, err = problemAPI.Get(defNotification.PID); err != nil {
+				numAttempts++
+				if numAttempts == 25 {
+					log.Warn("querying for problem details failed: " + err.Error())
+					return
+				}
+			} else {
+				numAttempts = 25
 			}
-		} else {
-			numAttempts = 5
+			time.Sleep(1000 * time.Millisecond)
 		}
-	}
 
-	problemEvent := ProblemEvent{Notification: &defNotification, Problem: problem}
-	listener.handler.Handle(&problemEvent)
+		problemEvent := ProblemEvent{Notification: &defNotification, Problem: problem}
+		listener.handler.Handle(&problemEvent)
+	}(problemAPI)
 
 	http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 }
