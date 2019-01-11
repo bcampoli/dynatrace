@@ -128,7 +128,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 			time.Sleep(1000 * time.Millisecond)
 		}
 
-		problemEvent := ProblemEvent{Notification: &defNotification, Problem: problem}
+		problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: problem}
 		listener.handler.Handle(&problemEvent)
 	}(problemAPI)
 
