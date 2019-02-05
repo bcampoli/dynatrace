@@ -2,7 +2,6 @@ package managementzones
 
 import (
 	"encoding/json"
-	"errors"
 
 	resterrors "github.com/dtcookie/dynatrace/apis/errors"
 	"github.com/dtcookie/dynatrace/rest"
@@ -15,56 +14,45 @@ type API struct {
 
 // NewAPI TODO: documentation
 func NewAPI(config *rest.Config, credentials *rest.Credentials) *API {
-	return &API{
-		client: rest.NewClient(config, credentials),
-	}
+	return &API{client: rest.NewClient(config, credentials)}
 }
 
-func unmarshal(data []byte, v interface{}) error {
-	return json.Unmarshal(data, v)
+// WithClient TODO: documentation
+func (api *API) WithClient(client *rest.Client) *API {
+	api.client = client
+	return api
 }
 
-func resolveError(bytes []byte, err error) error {
-	if bytes != nil {
-		var errorEnvelope resterrors.ErrorEnvelope
-		var innerError error
-		if innerError = json.Unmarshal(bytes, &errorEnvelope); innerError == nil {
-			if errorEnvelope.Error.Message != "" {
-				return errors.New(errorEnvelope.Error.Message)
-			} else {
-				return err
-			}
-		}
-	}
-	return err
+type getManagementZonesResponse struct {
+	Values []Stub `json:"values,omitempty"` // the Stubs of the currently configured Management Zones
 }
 
-// GetManagementZones queries for the existing Management Zones
+// List queries for the existing Management Zones
 // delivers only Stubs, not the actual configuration
-func (api *API) GetManagementZones() ([]Stub, error) {
+func (api *API) List() ([]Stub, error) {
 	var err error
+	var response getManagementZonesResponse
 	var bytes []byte
 
 	if bytes, err = api.client.GET("/api/config/v1/managementZones", 200); err != nil {
-		return nil, resolveError(bytes, err)
+		return nil, resterrors.Resolve(bytes, err)
 	}
-	var response GetManagementZonesResponse
-	if err = unmarshal(bytes, &response); err != nil {
+	if err = json.Unmarshal(bytes, &response); err != nil {
 		return nil, err
 	}
 	return response.Values, nil
 }
 
-// CreateManagementZone creates a new Management Zone
-func (api *API) CreateManagementZone(zone ManagementZone) (*Stub, error) {
+// Create creates a new Management Zone
+func (api *API) Create(zone ManagementZone) (*Stub, error) {
 	var err error
 	var bytes []byte
 
 	if bytes, err = api.client.POST("/api/config/v1/managementZones", &zone, 201); err != nil {
-		return nil, resolveError(bytes, err)
+		return nil, resterrors.Resolve(bytes, err)
 	}
 	var stub Stub
-	if err = unmarshal(bytes, &stub); err != nil {
+	if err = json.Unmarshal(bytes, &stub); err != nil {
 		return nil, err
 	}
 	return &stub, nil
