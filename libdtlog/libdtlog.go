@@ -71,6 +71,11 @@ func FAILED() {
 	Println(Red("FAILED"))
 }
 
+// OK TODO: documentation
+func OK() {
+	Println(Green("OK"))
+}
+
 // Fail TODO: documentation
 func Fail(v ...interface{}) bool {
 	FAILED()
