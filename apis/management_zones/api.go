@@ -45,7 +45,7 @@ func (api *API) GetManagementZones() ([]Stub, error) {
 	var err error
 	var bytes []byte
 
-	if bytes, err = api.client.Get("/api/config/v1/managementZones"); err != nil {
+	if bytes, err = api.client.GET("/api/config/v1/managementZones", 200); err != nil {
 		return nil, resolveError(bytes, err)
 	}
 	var response GetManagementZonesResponse
@@ -60,7 +60,7 @@ func (api *API) CreateManagementZone(zone ManagementZone) (*Stub, error) {
 	var err error
 	var bytes []byte
 
-	if bytes, err = api.client.Post("/api/config/v1/managementZones", &zone); err != nil {
+	if bytes, err = api.client.POST("/api/config/v1/managementZones", &zone, 201); err != nil {
 		return nil, resolveError(bytes, err)
 	}
 	var stub Stub

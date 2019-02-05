@@ -27,7 +27,7 @@ func (api *API) Get() (string, error) {
 	var version Version
 	var errorEnvelope resterrors.ErrorEnvelope
 
-	if bytes, err = api.client.Get("/api/v1/config/clusterversion"); err != nil {
+	if bytes, err = api.client.GET("/api/v1/config/clusterversion", 200); err != nil {
 		if bytes != nil {
 			var innerError error
 			if innerError = json.Unmarshal(bytes, &errorEnvelope); innerError == nil {

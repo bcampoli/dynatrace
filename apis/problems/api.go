@@ -27,7 +27,7 @@ func (api *API) Get(ID string) (*Problem, error) {
 	var problemResult problemResult
 	var errorEnvelope resterrors.ErrorEnvelope
 
-	if bytes, err = api.client.Get("/api/v1/problem/details/" + ID); err != nil {
+	if bytes, err = api.client.GET("/api/v1/problem/details/"+ID, 200); err != nil {
 		if bytes != nil {
 			var innerError error
 			if innerError = json.Unmarshal(bytes, &errorEnvelope); innerError == nil {
