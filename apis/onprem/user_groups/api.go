@@ -1,4 +1,4 @@
-package users
+package usersgroups
 
 import (
 	"encoding/json"
@@ -19,17 +19,32 @@ func NewAPI(config *rest.Config, credentials *rest.Credentials) *API {
 	return &API{client: rest.NewClient(config, credentials)}
 }
 
-// GetUsers queries for the currently configured users
-func (api *API) GetUsers() ([]UserConfig, error) {
+// All queries for the currently configured users
+func (api *API) All() ([]GroupConfig, error) {
 	var err error
 	var bytes []byte
 
-	if bytes, err = api.client.GET("/api/v1.0/onpremise/users", 200); err != nil {
+	if bytes, err = api.client.GET("/api/v1.0/onpremise/groups", 200); err != nil {
 		return nil, resterrors.Resolve(bytes, err)
 	}
-	var response []UserConfig
+	var response []GroupConfig
 	if err = json.Unmarshal(bytes, &response); err != nil {
 		return nil, err
 	}
 	return response, nil
+}
+
+// Create queries for the currently configured users
+func (api *API) Create(groupConfig GroupConfig) (*GroupConfig, error) {
+	var err error
+	var bytes []byte
+
+	if bytes, err = api.client.POST("/api/v1.0/onpremise/groups", groupConfig, 200); err != nil {
+		return nil, resterrors.Resolve(bytes, err)
+	}
+	var response GroupConfig
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
 }
