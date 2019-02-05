@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"crypto/tls"
 	"encoding/json"
-	"errors"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -14,6 +14,7 @@ import (
 type Client struct {
 	config      *Config
 	credentials *Credentials
+	httpClient  *http.Client
 }
 
 // NewClient TODO: documentation
@@ -21,33 +22,24 @@ func NewClient(config *Config, credentials *Credentials) *Client {
 	client := Client{}
 	client.credentials = credentials
 	client.config = config
+	client.httpClient = createHTTPClient(config)
 	return &client
 }
 
-func (client *Client) createHTTPClient() *http.Client {
+func createHTTPClient(config *Config) *http.Client {
 	var httpClient *http.Client
-	if client.config.NoProxy {
-		if client.config.Insecure {
+	if config.NoProxy {
+		if config.Insecure {
 			httpClient = &http.Client{
 				Transport: &http.Transport{
 					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-					Proxy:           http.ProxyURL(nil),
-				},
-			}
+					Proxy:           http.ProxyURL(nil)}}
 		} else {
-			httpClient = &http.Client{
-				Transport: &http.Transport{
-					Proxy: http.ProxyURL(nil),
-				},
-			}
+			httpClient = &http.Client{Transport: &http.Transport{Proxy: http.ProxyURL(nil)}}
 		}
 	} else {
-		if client.config.Insecure {
-			httpClient = &http.Client{
-				Transport: &http.Transport{
-					TLSClientConfig: &tls.Config{InsecureSkipVerify: true},
-				},
-			}
+		if config.Insecure {
+			httpClient = &http.Client{Transport: &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}}
 		} else {
 			httpClient = &http.Client{}
 		}
@@ -66,12 +58,11 @@ func (client *Client) getURL(path string) string {
 	return apiBaseURL + path
 }
 
-// Get TODO: documentation
-func (client *Client) Get(path string) ([]byte, error) {
+// GET TODO: documentation
+func (client *Client) GET(path string, expectedStatusCode int) ([]byte, error) {
 	var err error
 	var httpResponse *http.Response
 	var request *http.Request
-	var bytes []byte
 
 	url := client.getURL(path)
 	if request, err = http.NewRequest(http.MethodGet, url, nil); err != nil {
@@ -81,38 +72,34 @@ func (client *Client) Get(path string) ([]byte, error) {
 		return make([]byte, 0), err
 	}
 
-	httpClient := client.createHTTPClient()
-
-	if httpResponse, err = httpClient.Do(request); err != nil {
+	if httpResponse, err = client.httpClient.Do(request); err != nil {
 		return make([]byte, 0), err
 	}
-	if httpResponse.StatusCode != http.StatusOK {
-		finalError := errors.New(http.StatusText(httpResponse.StatusCode) + " (GET " + url + ")")
-		if bytes, err = ioutil.ReadAll(httpResponse.Body); err != nil {
-			return nil, finalError
-		}
-		return bytes, finalError
-	}
-	return ioutil.ReadAll(httpResponse.Body)
+	return readHTTPResponse(httpResponse, http.MethodGet, url, expectedStatusCode)
 }
 
-// Post TODO: documentation
-func (client *Client) Post(path string, payload interface{}) ([]byte, error) {
+// POST TODO: documentation
+func (client *Client) POST(path string, payload interface{}, expectedStatusCode int) ([]byte, error) {
+	return client.send(path, http.MethodPost, payload, expectedStatusCode)
+}
+
+// PUT TODO: documentation
+func (client *Client) PUT(path string, payload interface{}, expectedStatusCode int) ([]byte, error) {
+	return client.send(path, http.MethodPut, payload, expectedStatusCode)
+}
+
+func (client *Client) send(path string, method string, payload interface{}, expectedStatusCode int) ([]byte, error) {
 	var err error
 	var request *http.Request
-	var response *http.Response
+	var httpResponse *http.Response
 	var requestbody []byte
-	var body []byte
-
-	var httpClient *http.Client
-	httpClient = client.createHTTPClient()
 
 	if requestbody, err = json.Marshal(payload); err != nil {
 		return nil, err
 	}
 
 	url := client.getURL(path)
-	if request, err = http.NewRequest("POST", url, bytes.NewReader(requestbody)); err != nil {
+	if request, err = http.NewRequest(method, url, bytes.NewReader(requestbody)); err != nil {
 		return nil, err
 	}
 
@@ -121,12 +108,25 @@ func (client *Client) Post(path string, payload interface{}) ([]byte, error) {
 	}
 
 	request.Header.Add("Content-Type", "application/json")
-	if response, err = httpClient.Do(request); err != nil {
+	if httpResponse, err = client.httpClient.Do(request); err != nil {
 		return nil, err
 	}
-	defer response.Body.Close()
+	return readHTTPResponse(httpResponse, method, url, expectedStatusCode)
+}
 
-	if body, err = ioutil.ReadAll(response.Body); err != nil {
+func readHTTPResponse(httpResponse *http.Response, method string, url string, expectedStatusCode int) ([]byte, error) {
+	var err error
+	var body []byte
+	defer httpResponse.Body.Close()
+
+	if httpResponse.StatusCode != expectedStatusCode {
+		finalError := fmt.Errorf("%s (%s) %s", http.StatusText(httpResponse.StatusCode), method, url)
+		if body, err = ioutil.ReadAll(httpResponse.Body); err != nil {
+			return nil, finalError
+		}
+		return body, finalError
+	}
+	if body, err = ioutil.ReadAll(httpResponse.Body); err != nil {
 		return nil, err
 	}
 	return body, nil
