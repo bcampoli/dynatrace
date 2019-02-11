@@ -2,6 +2,7 @@ package users
 
 import (
 	"encoding/json"
+	"errors"
 
 	resterrors "github.com/dtcookie/dynatrace/apis/errors"
 	"github.com/dtcookie/dynatrace/rest"
@@ -32,4 +33,9 @@ func (api *API) GetUsers() ([]UserConfig, error) {
 		return nil, err
 	}
 	return response, nil
+}
+
+// Create TODO: documentation
+func (api *API) Create(config *UserConfig) error {
+	return errors.New("Not Implemented")
 }
