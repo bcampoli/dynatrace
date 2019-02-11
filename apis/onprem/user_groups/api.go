@@ -48,3 +48,14 @@ func (api *API) Create(groupConfig GroupConfig) (*GroupConfig, error) {
 	}
 	return &response, nil
 }
+
+// Delete deletes a group
+func (api *API) Delete(ID string) error {
+	var err error
+	var bytes []byte
+
+	if bytes, err = api.client.DELETE("/api/v1.0/onpremise/groups/"+ID, 200); err != nil {
+		return resterrors.Resolve(bytes, err)
+	}
+	return nil
+}
