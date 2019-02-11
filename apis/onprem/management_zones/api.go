@@ -26,11 +26,11 @@ func (api *API) GetPermissionsForGroup(groupID string) ([]PermissionsForGroup, e
 	if bytes, err = api.client.GET("/api/v1.0/onpremise/groups/managementZones/"+groupID, 200); err != nil {
 		return nil, resterrors.Resolve(bytes, err)
 	}
-	var response []PermissionsForGroup
+	var response PermissionsForGroup
 	if err = json.Unmarshal(bytes, &response); err != nil {
 		return nil, err
 	}
-	return response, nil
+	return []PermissionsForGroup{response}, nil
 }
 
 // GetPermissions queries for the configured management zone permissions for all groups
