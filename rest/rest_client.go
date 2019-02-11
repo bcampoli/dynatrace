@@ -83,6 +83,26 @@ func (client *Client) POST(path string, payload interface{}, expectedStatusCode 
 	return client.send(path, http.MethodPost, payload, expectedStatusCode)
 }
 
+// DELETE TODO: documentation
+func (client *Client) DELETE(path string, expectedStatusCode int) ([]byte, error) {
+	var err error
+	var httpResponse *http.Response
+	var request *http.Request
+
+	url := client.getURL(path)
+	if request, err = http.NewRequest(http.MethodDelete, url, nil); err != nil {
+		return make([]byte, 0), err
+	}
+	if err = client.credentials.Authenticate(request); err != nil {
+		return make([]byte, 0), err
+	}
+
+	if httpResponse, err = client.httpClient.Do(request); err != nil {
+		return make([]byte, 0), err
+	}
+	return readHTTPResponse(httpResponse, http.MethodDelete, url, expectedStatusCode)
+}
+
 // PUT TODO: documentation
 func (client *Client) PUT(path string, payload interface{}, expectedStatusCode int) ([]byte, error) {
 	return client.send(path, http.MethodPut, payload, expectedStatusCode)
