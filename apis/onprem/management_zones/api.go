@@ -49,16 +49,12 @@ func (api *API) GetPermissions() ([]PermissionsForGroup, error) {
 }
 
 // SetPermissionsForGroup Get management zone permissions for a given group
-func (api *API) SetPermissionsForGroup(permissions PermissionsForGroup) ([]PermissionsForGroup, error) {
+func (api *API) SetPermissionsForGroup(permissions PermissionsForGroup) error {
 	var err error
 	var bytes []byte
 
 	if bytes, err = api.client.PUT("/api/v1.0/onpremise/groups/managementZones", permissions, 200); err != nil {
-		return nil, resterrors.Resolve(bytes, err)
+		return resterrors.Resolve(bytes, err)
 	}
-	var response PermissionsForGroup
-	if err = json.Unmarshal(bytes, &response); err != nil {
-		return nil, err
-	}
-	return []PermissionsForGroup{response}, nil
+	return nil
 }
