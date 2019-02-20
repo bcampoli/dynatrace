@@ -43,6 +43,22 @@ func (api *API) List() ([]Stub, error) {
 	return response.Values, nil
 }
 
+// Get queries for the existing Management Zones
+// delivers only Stubs, not the actual configuration
+func (api *API) Get(ID string) (*Stub, error) {
+	var err error
+	var response Stub
+	var bytes []byte
+
+	if bytes, err = api.client.GET("/api/config/v1/managementZones/"+ID, 200); err != nil {
+		return nil, resterrors.Resolve(bytes, err)
+	}
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
 // Create creates a new Management Zone
 func (api *API) Create(zone ManagementZone) (*Stub, error) {
 	var err error
