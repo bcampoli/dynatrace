@@ -66,6 +66,13 @@ func Println(v ...interface{}) {
 	fmt.Println()
 }
 
+// Print TODO: documentation
+func Print(v ...interface{}) {
+	for _, value := range v {
+		fmt.Print(value)
+	}
+}
+
 // FAILED TODO: documentation
 func FAILED() {
 	Println(Red("FAILED"))
