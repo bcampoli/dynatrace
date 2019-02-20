@@ -7,8 +7,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"net/http/cookiejar"
 	"strings"
 )
+
+var jar = createJar()
+
+func createJar() *cookiejar.Jar {
+	jar, _ := cookiejar.New(nil)
+	return jar
+}
 
 // Client TODO: documentation
 type Client struct {
@@ -44,6 +52,7 @@ func createHTTPClient(config *Config) *http.Client {
 			httpClient = &http.Client{}
 		}
 	}
+	httpClient.Jar = jar
 	return httpClient
 }
 
@@ -75,12 +84,22 @@ func (client *Client) GET(path string, expectedStatusCode int) ([]byte, error) {
 	if httpResponse, err = client.httpClient.Do(request); err != nil {
 		return make([]byte, 0), err
 	}
-	return readHTTPResponse(httpResponse, http.MethodGet, url, expectedStatusCode)
+	return readHTTPResponse(httpResponse, http.MethodGet, url, expectedStatusCode, nil)
+}
+
+// NewPOST TODO: documentation
+func (client *Client) NewPOST(path string, payload interface{}) *Post {
+	return newPost(client, path, payload)
+}
+
+// NewPUT TODO: documentation
+func (client *Client) NewPUT(path string, payload interface{}) *Put {
+	return newPut(client, path, payload)
 }
 
 // POST TODO: documentation
 func (client *Client) POST(path string, payload interface{}, expectedStatusCode int) ([]byte, error) {
-	return client.send(path, http.MethodPost, payload, expectedStatusCode)
+	return client.send(path, http.MethodPost, payload, expectedStatusCode, nil)
 }
 
 // DELETE TODO: documentation
@@ -100,15 +119,15 @@ func (client *Client) DELETE(path string, expectedStatusCode int) ([]byte, error
 	if httpResponse, err = client.httpClient.Do(request); err != nil {
 		return make([]byte, 0), err
 	}
-	return readHTTPResponse(httpResponse, http.MethodDelete, url, expectedStatusCode)
+	return readHTTPResponse(httpResponse, http.MethodDelete, url, expectedStatusCode, nil)
 }
 
 // PUT TODO: documentation
 func (client *Client) PUT(path string, payload interface{}, expectedStatusCode int) ([]byte, error) {
-	return client.send(path, http.MethodPut, payload, expectedStatusCode)
+	return client.send(path, http.MethodPut, payload, expectedStatusCode, nil)
 }
 
-func (client *Client) send(path string, method string, payload interface{}, expectedStatusCode int) ([]byte, error) {
+func (client *Client) send(path string, method string, payload interface{}, expectedStatusCode int, onResponse func(int) error) ([]byte, error) {
 	var err error
 	var request *http.Request
 	var httpResponse *http.Response
@@ -131,13 +150,19 @@ func (client *Client) send(path string, method string, payload interface{}, expe
 	if httpResponse, err = client.httpClient.Do(request); err != nil {
 		return nil, err
 	}
-	return readHTTPResponse(httpResponse, method, url, expectedStatusCode)
+	return readHTTPResponse(httpResponse, method, url, expectedStatusCode, onResponse)
 }
 
-func readHTTPResponse(httpResponse *http.Response, method string, url string, expectedStatusCode int) ([]byte, error) {
+func readHTTPResponse(httpResponse *http.Response, method string, url string, expectedStatusCode int, onResponse func(int) error) ([]byte, error) {
 	var err error
 	var body []byte
 	defer httpResponse.Body.Close()
+
+	if onResponse != nil {
+		if err = onResponse(httpResponse.StatusCode); err != nil {
+			return nil, err
+		}
+	}
 
 	if httpResponse.StatusCode != expectedStatusCode {
 		finalError := fmt.Errorf("%s (%s) %s", http.StatusText(httpResponse.StatusCode), method, url)
