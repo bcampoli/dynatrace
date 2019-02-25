@@ -9,7 +9,11 @@ import (
 	"net/http"
 	"net/http/cookiejar"
 	"strings"
+
+	"github.com/dtcookie/dynatrace/libdtlog"
 )
+
+var Verbose = false
 
 var jar = createJar()
 
@@ -74,6 +78,9 @@ func (client *Client) GET(path string, expectedStatusCode int) ([]byte, error) {
 	var request *http.Request
 
 	url := client.getURL(path)
+	if Verbose {
+		dtlog.Println(fmt.Sprintf("GET %s", url))
+	}
 	if request, err = http.NewRequest(http.MethodGet, url, nil); err != nil {
 		return make([]byte, 0), err
 	}
@@ -138,6 +145,9 @@ func (client *Client) send(path string, method string, payload interface{}, expe
 	}
 
 	url := client.getURL(path)
+	if Verbose {
+		dtlog.Println(fmt.Sprintf("%s %s", strings.ToUpper(method), url))
+	}
 	if request, err = http.NewRequest(method, url, bytes.NewReader(requestbody)); err != nil {
 		return nil, err
 	}
@@ -158,6 +168,10 @@ func readHTTPResponse(httpResponse *http.Response, method string, url string, ex
 	var body []byte
 	defer httpResponse.Body.Close()
 
+	if Verbose {
+		dtlog.Println(fmt.Sprintf("  %d %s", httpResponse.StatusCode, http.StatusText(httpResponse.StatusCode)))
+	}
+
 	if onResponse != nil {
 		if err = onResponse(httpResponse.StatusCode); err != nil {
 			return nil, err
@@ -169,10 +183,16 @@ func readHTTPResponse(httpResponse *http.Response, method string, url string, ex
 		if body, err = ioutil.ReadAll(httpResponse.Body); err != nil {
 			return nil, finalError
 		}
+		if Verbose && (body != nil) && len(body) > 0 {
+			dtlog.Println("  " + string(body))
+		}
 		return body, finalError
 	}
 	if body, err = ioutil.ReadAll(httpResponse.Body); err != nil {
 		return nil, err
+	}
+	if Verbose && (body != nil) && len(body) > 0 {
+		dtlog.Println("  " + string(body))
 	}
 	return body, nil
 }
