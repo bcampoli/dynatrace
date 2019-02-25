@@ -147,6 +147,7 @@ func (client *Client) send(path string, method string, payload interface{}, expe
 	url := client.getURL(path)
 	if Verbose {
 		dtlog.Println(fmt.Sprintf("%s %s", strings.ToUpper(method), url))
+		dtlog.Println("  Request Body: " + string(requestbody))
 	}
 	if request, err = http.NewRequest(method, url, bytes.NewReader(requestbody)); err != nil {
 		return nil, err
@@ -184,7 +185,7 @@ func readHTTPResponse(httpResponse *http.Response, method string, url string, ex
 			return nil, finalError
 		}
 		if Verbose && (body != nil) && len(body) > 0 {
-			dtlog.Println("  " + string(body))
+			dtlog.Println("  Response Body: " + string(body))
 		}
 		return body, finalError
 	}
@@ -192,7 +193,7 @@ func readHTTPResponse(httpResponse *http.Response, method string, url string, ex
 		return nil, err
 	}
 	if Verbose && (body != nil) && len(body) > 0 {
-		dtlog.Println("  " + string(body))
+		dtlog.Println("  Response Body: " + string(body))
 	}
 	return body, nil
 }
