@@ -36,12 +36,14 @@ func (listener *listener) listen() {
 	var clusterVersion string
 	var err error
 
-	clusterAPI := cluster.NewAPI(listener.restConfig, &listener.config.Credentials)
-	if clusterVersion, err = clusterAPI.Get(); err != nil {
-		log.Error(err)
-		return
+	if len(listener.config.Credentials.APIBaseURL) > 0 && len(listener.config.Credentials.APIToken) > 0 {
+		clusterAPI := cluster.NewAPI(listener.restConfig, &listener.config.Credentials)
+		if clusterVersion, err = clusterAPI.Get(); err != nil {
+			log.Error(err)
+			return
+		}
+		log.Info("Dynatrace Cluster Version: " + clusterVersion)
 	}
-	log.Info("Dynatrace Cluster Version: " + clusterVersion)
 	http.HandleFunc("/", listener.handleHTTP)
 	log.Info(fmt.Sprintf("Listening on port %d for incoming problem notifications.", listener.config.ListenPort))
 	http.ListenAndServe(fmt.Sprintf(":%d", listener.config.ListenPort), nil)
@@ -107,30 +109,38 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 		return
 	}
-	if listener.config.Verbose {
-		log.Info("querying for problem details")
-	}
-	problemAPI := problems.NewAPI(listener.restConfig, &listener.config.Credentials)
-	go func(problemAPI *problems.API) {
-		var problem *problems.Problem
-		numAttempts := 0
 
-		for numAttempts < 25 {
-			if problem, err = problemAPI.Get(defNotification.PID); err != nil {
-				numAttempts++
-				if numAttempts == 25 {
-					log.Warn("querying for problem details failed: " + err.Error())
-					return
-				}
-			} else {
-				numAttempts = 25
-			}
-			time.Sleep(1000 * time.Millisecond)
+	if len(listener.config.Credentials.APIBaseURL) > 0 && len(listener.config.Credentials.APIToken) > 0 {
+		if listener.config.Verbose {
+			log.Info("querying for problem details")
 		}
+		problemAPI := problems.NewAPI(listener.restConfig, &listener.config.Credentials)
+		go func(problemAPI *problems.API) {
+			var problem *problems.Problem
+			numAttempts := 0
 
-		problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: problem}
-		listener.handler.Handle(&problemEvent)
-	}(problemAPI)
+			for numAttempts < 25 {
+				if problem, err = problemAPI.Get(defNotification.PID); err != nil {
+					numAttempts++
+					if numAttempts == 25 {
+						log.Warn("querying for problem details failed: " + err.Error())
+						return
+					}
+				} else {
+					numAttempts = 25
+				}
+				time.Sleep(1000 * time.Millisecond)
+			}
+
+			problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: problem}
+			listener.handler.Handle(&problemEvent)
+		}(problemAPI)
+	} else {
+		go func() {
+			problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: defNotification.ProblemDetailsJSON}
+			listener.handler.Handle(&problemEvent)
+		}()
+	}
 
 	http.Error(w, http.StatusText(http.StatusNoContent), http.StatusNoContent)
 }

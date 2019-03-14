@@ -9,6 +9,7 @@ import (
 	"os"
 	"strconv"
 
+	"github.com/dtcookie/dynatrace/log"
 	"github.com/dtcookie/dynatrace/rest"
 )
 
@@ -43,13 +44,17 @@ func ParseConfig(flagset *flag.FlagSet) (*Config, error) {
 		return nil, errors.New("no listen port specified")
 	}
 
-	if config.Credentials.APIToken == "" {
-		return nil, errors.New("no api token specified")
+	if config.Credentials.APIToken == "" || config.Credentials.APIBaseURL == "" {
+		log.Info("API Token or API Base URL not specified - fetching problem details disabled")
 	}
 
-	if config.Credentials.APIBaseURL == "" {
-		return nil, errors.New("no api base url specified")
-	}
+	// if config.Credentials.APIToken == "" {
+	// 	return nil, errors.New("no api token specified")
+	// }
+
+	// if config.Credentials.APIBaseURL == "" {
+	// 	return nil, errors.New("no api base url specified")
+	// }
 
 	return &config, nil
 }
