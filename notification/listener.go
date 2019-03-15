@@ -137,6 +137,11 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 		}(problemAPI)
 	} else {
 		go func() {
+			var prob *problems.Problem
+			if prob = defNotification.ProblemDetailsJSON; prob == nil {
+				prob = &problems.Problem{}
+			}
+
 			problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: defNotification.ProblemDetailsJSON}
 			listener.handler.Handle(&problemEvent)
 		}()
