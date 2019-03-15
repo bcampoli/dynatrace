@@ -142,7 +142,7 @@ func (listener *listener) handleHTTP(w http.ResponseWriter, request *http.Reques
 				prob = &problems.Problem{}
 			}
 
-			problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: defNotification.ProblemDetailsJSON}
+			problemEvent := ProblemEvent{URI: request.RequestURI, Notification: &defNotification, Problem: prob}
 			listener.handler.Handle(&problemEvent)
 		}()
 	}
