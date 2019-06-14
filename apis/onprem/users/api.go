@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 
-	resterrors "github.com/dtcookie/dynatrace/apis/errors"
-	"github.com/dtcookie/dynatrace/rest"
+	resterrors "github.com/bcampoli/dynatrace/apis/errors"
+	"github.com/bcampoli/dynatrace/rest"
 )
 
 // API is able to make REST API Calls to the Users API of an

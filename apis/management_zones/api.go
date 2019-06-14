@@ -3,8 +3,8 @@ package managementzones
 import (
 	"encoding/json"
 
-	resterrors "github.com/dtcookie/dynatrace/apis/errors"
-	"github.com/dtcookie/dynatrace/rest"
+	resterrors "github.com/bcampoli/dynatrace/apis/errors"
+	"github.com/bcampoli/dynatrace/rest"
 )
 
 // API TODO: documentation
