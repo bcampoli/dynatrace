@@ -36,6 +36,21 @@ func (api *API) GetUsers() ([]UserConfig, error) {
 	return response, nil
 }
 
+// GetUser gets user with the id specified
+func (api *API) GetUser(id string) (*UserConfig, error) {
+	var err error
+	var bytes []byte
+
+	if bytes, err = api.client.GET("/api/v1.0/onpremise/users/"+id, 200); err != nil {
+		return nil, resterrors.Resolve(bytes, err)
+	}
+	var response UserConfig
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
 // Create TODO: documentation
 func (api *API) Create(config *UserConfig) (*UserConfig, error) {
 	var err error
@@ -48,7 +63,7 @@ func (api *API) Create(config *UserConfig) (*UserConfig, error) {
 		case 200:
 			return nil
 		case 400:
-			return errors.New("All values (ID, email, first name, last name) must be set")
+			return errors.New("Create error: All values (ID, email, first name, last name) must be set")
 		case 406:
 			return errors.New("Unacceptable request")
 		case 522:
@@ -79,7 +94,7 @@ func (api *API) Update(config *UserConfig) (*UserConfig, error) {
 		case 200:
 			return nil
 		case 400:
-			return errors.New("All values (ID, email, first name, last name) must be set")
+			return errors.New("Update error: All values (ID, email, first name, last name) must be set")
 		case 406:
 			return errors.New("Unacceptable request")
 		case 524:
@@ -89,6 +104,21 @@ func (api *API) Update(config *UserConfig) (*UserConfig, error) {
 		}
 	}).Send(); err != nil {
 		return nil, err
+	}
+	var response UserConfig
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+// Delete a user
+func (api *API) Delete(id string) (*UserConfig, error) {
+	var err error
+	var bytes []byte
+
+	if bytes, err = api.client.DELETE("/api/v1.0/onpremise/users/"+id, 200); err != nil {
+		return nil, resterrors.Resolve(bytes, err)
 	}
 	var response UserConfig
 	if err = json.Unmarshal(bytes, &response); err != nil {

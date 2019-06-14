@@ -34,12 +34,42 @@ func (api *API) All() ([]GroupConfig, error) {
 	return response, nil
 }
 
+// Get User Group with the specified ID
+func (api *API) Get(id string) (*GroupConfig, error) {
+	var err error
+	var bytes []byte
+
+	if bytes, err = api.client.GET("/api/v1.0/onpremise/groups/"+id, 200); err != nil {
+		return nil, resterrors.Resolve(bytes, err)
+	}
+	var response GroupConfig
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
 // Create queries for the currently configured users
-func (api *API) Create(groupConfig GroupConfig) (*GroupConfig, error) {
+func (api *API) Create(groupConfig *GroupConfig) (*GroupConfig, error) {
 	var err error
 	var bytes []byte
 
 	if bytes, err = api.client.POST("/api/v1.0/onpremise/groups", groupConfig, 200); err != nil {
+		return nil, resterrors.Resolve(bytes, err)
+	}
+	var response GroupConfig
+	if err = json.Unmarshal(bytes, &response); err != nil {
+		return nil, err
+	}
+	return &response, nil
+}
+
+// Update updates existing group
+func (api *API) Update(groupConfig *GroupConfig) (*GroupConfig, error) {
+	var err error
+	var bytes []byte
+
+	if bytes, err = api.client.PUT("/api/v1.0/onpremise/groups", groupConfig, 200); err != nil {
 		return nil, resterrors.Resolve(bytes, err)
 	}
 	var response GroupConfig
